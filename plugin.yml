@@ -1,5 +1,5 @@
 name: MMOInventory
-version: 1.0.2
+version: 1.0.3
 main: net.Indyuce.inventory.MMOInventory
 author: Indyuce
 api-version: 1.13
