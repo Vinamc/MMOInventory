@@ -1,0 +1,24 @@
+
+# Saves player inventories data when leaving
+# so it empties the RAM from inventory data.
+# Reloads a server reload when changed.
+save-on-leave: true
+
+# Amount of slots in the inventory.
+# Has to be a multiple of 9.
+inventory-slots: 36
+
+# Enable/disable auto resource pack download.
+# Reloads a server reload when changed.
+# Default RP: https://www.dropbox.com/s/rq550yj7iebwixl/mmoinventory_rp.zip?dl=1
+resource-pack:
+    enabled: true
+    url: resource_pack_url
+    delay: 20
+    
+    # Kick player if he does not accept the server
+    # resource pack or if the download failed.
+    # Reloads a server reload when changed.
+    kick:
+        enabled: false
+        message: 'Please accept server resource pack!'

@@ -1,0 +1,20 @@
+name: MMOInventory
+version: 1.0.2
+main: net.Indyuce.inventory.MMOInventory
+author: Indyuce
+api-version: 1.13
+depend: [MMOItems]
+commands:
+    mmoinventory:
+        description: Opens the custom inventory.
+        aliases: [rpginventory,mmoinv,rpginv]
+permissions:
+    mmoinventory.open:
+        description: Allows to open your own inventory using a command.
+        default: false
+    mmoinventory.open.other:
+        description: Allows to open another player's inventory.
+        default: false
+    mmoinventory.admin:
+        description: Allows to use admin commands.
+        default: false
