@@ -3,7 +3,9 @@ package net.Indyuce.inventory.api;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -78,6 +80,15 @@ public class InventoryData {
 
 	public Collection<ItemStack> getExtraItems() {
 		return items.values();
+	}
+
+	public Set<Integer> getFilledSlotKeys() {
+		return items.keySet();
+	}
+
+	// heavy performance, use above instead
+	public Set<CustomSlot> getFilledSlots() {
+		return items.keySet().stream().map(id -> MMOInventory.plugin.getSlotManager().get(id)).collect(Collectors.toSet());
 	}
 
 	public void setPlayer(Player player) {

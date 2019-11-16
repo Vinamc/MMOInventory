@@ -7,6 +7,15 @@ save-on-leave: true
 # Remember to update the slot numbers in items.yml after changing this option.
 inventory-slots: 36
 
+# Enable this option to move the accessory slots to the player
+# inventory. A tutorial is available on the resource page.
+# Requires a server reload when changed.
+no-custom-inventory: false
+
+# Items will drop (when keep-inventory is disabled) on death.
+# Requires a server reload when changed.
+drop-on-death: true
+
 # Enable/disable auto resource pack download. Requires a server reload when changed.
 # Default RP: https://www.dropbox.com/s/rq550yj7iebwixl/mmoinventory_rp.zip?dl=1
 resource-pack:
