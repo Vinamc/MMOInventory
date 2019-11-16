@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -23,12 +24,20 @@ public class SlotManager {
 	/*
 	 * custom slot instances saved using bukkit inventory slot index
 	 */
-	public final Map<Integer, CustomSlot> slots = new HashMap<>();
+	private final Map<Integer, CustomSlot> slots = new HashMap<>();
+
+	/*
+	 * used by external plugins to load slot instances differently/different
+	 * instances. best option is to create a class which extends CustomSlot and
+	 * make these class register using this function. this function is called
+	 * WHENEVER MMOInventory reads a config section from items.yml
+	 */
+	private Function<ConfigurationSection, CustomSlot> slotLoader = config -> new CustomSlot(config);
 
 	/*
 	 * used to fill up inventory space
 	 */
-	private CustomSlot fill = new CustomSlot("FILL", "", SlotType.FILL, -1, new ItemStack(Material.AIR), "");
+	private CustomSlot fill = new CustomSlot("FILL", "", SlotType.FILL, -1, new ItemStack(Material.AIR));
 
 	public void register(CustomSlot slot) {
 
@@ -54,6 +63,12 @@ public class SlotManager {
 		return slots.values();
 	}
 
+	public void setSlotLoader(Function<ConfigurationSection, CustomSlot> slotLoader) {
+		Validate.notNull(slotLoader, "Slot loader must not be null");
+
+		this.slotLoader = slotLoader;
+	}
+
 	public CustomSlot getFiller() {
 		return fill;
 	}
@@ -67,7 +82,7 @@ public class SlotManager {
 				ConfigurationSection section = config.getConfigurationSection(key);
 				Validate.notNull(section, "Could not read config section");
 
-				register(new CustomSlot(section));
+				register(slotLoader.apply(section));
 			} catch (IllegalArgumentException exception) {
 				MMOInventory.plugin.getLogger().log(Level.WARNING, "Could not load slot " + key + ": " + exception.getMessage());
 			}

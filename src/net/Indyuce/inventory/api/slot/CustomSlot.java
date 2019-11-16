@@ -12,10 +12,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.Indyuce.mmoitems.MMOItems;
-import net.Indyuce.mmoitems.api.Type;
-import net.Indyuce.mmoitems.api.item.NBTItem;
-import net.Indyuce.mmoitems.version.nms.ItemTag;
+import net.Indyuce.inventory.MMOInventory;
+import net.Indyuce.inventory.api.NBTItem;
+import net.Indyuce.inventory.version.ItemTag;
 
 public class CustomSlot {
 
@@ -24,18 +23,15 @@ public class CustomSlot {
 	private final int slot;
 	private final ItemStack item;
 
-	private String mmoitemType;
-
 	/*
 	 * may be used to register custom slots using other plugins
 	 */
-	public CustomSlot(String id, String name, SlotType type, int slot, ItemStack item, String mmoitemType) {
+	public CustomSlot(String id, String name, SlotType type, int slot, ItemStack item) {
 		this.id = id;
 		this.name = name;
 		this.type = type;
 		this.slot = slot;
 		this.item = item;
-		this.mmoitemType = mmoitemType;
 	}
 
 	public CustomSlot(ConfigurationSection config) {
@@ -46,9 +42,6 @@ public class CustomSlot {
 		type = SlotType.valueOf(config.getString("type").toUpperCase().replace("-", "_").replace(" ", "_"));
 		slot = config.getInt("slot");
 
-		if (type.isCustom())
-			Validate.notNull(mmoitemType = config.getString("mmoitems-type"), "Could not read slot MMOItems type");
-
 		/*
 		 * cache slot item
 		 */
@@ -56,7 +49,8 @@ public class CustomSlot {
 		Validate.notNull(config.getStringList("lore"), "Could not read slot lore");
 
 		Validate.notNull(config.getString("material"), "Could not read material");
-		ItemStack item = new ItemStack(Material.valueOf(config.getString("material").toUpperCase().replace("-", "_").replace(" ", "_")));
+		int model = config.contains("durability") ? config.getInt("durability") : config.getInt("custom-model-data");
+		ItemStack item = MMOInventory.plugin.getVersionWrapper().getModelItem(Material.valueOf(config.getString("material").toUpperCase().replace("-", "_").replace(" ", "_")), model);
 		ItemMeta meta = item.getItemMeta();
 		if (meta instanceof Damageable)
 			((Damageable) meta).setDamage((short) config.getInt("durability"));
@@ -69,9 +63,7 @@ public class CustomSlot {
 		meta.setLore(lore);
 		item.setItemMeta(meta);
 
-		NBTItem nbt = MMOItems.plugin.getNMS().getNBTItem(item).addTag(new ItemTag("inventoryItem", getId()));
-		if (MMOItems.plugin.getVersion().isStrictlyHigher(1, 13))
-			nbt.addTag(new ItemTag("CustomModelData", config.getInt("durability")));
+		NBTItem nbt = MMOInventory.plugin.getVersionWrapper().getNBTItem(item).addTag(new ItemTag("inventoryItem", getId()));
 		this.item = nbt.toItem();
 	}
 
@@ -95,23 +87,11 @@ public class CustomSlot {
 		return type;
 	}
 
-	public boolean matches(Type type) {
-		return mmoitemType.equalsIgnoreCase(type.getId());
-	}
-
-	public String getMMOItemType() {
-		return mmoitemType;
-	}
-
 	public ItemStack getItem() {
 		return item;
 	}
 
 	public boolean canEquip(ItemStack item) {
-		if (!getType().isCustom())
-			return type.getVanillaSlotHandler().canEquip(item);
-
-		Type type = NBTItem.get(item).getType();
-		return type != null && matches(type);
+		return getType().isCustom() || type.getVanillaSlotHandler().canEquip(item);
 	}
 }

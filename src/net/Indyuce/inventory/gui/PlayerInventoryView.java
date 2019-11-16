@@ -8,23 +8,19 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.api.InventoryData;
+import net.Indyuce.inventory.api.NBTItem;
 import net.Indyuce.inventory.api.event.ItemEquipEvent;
 import net.Indyuce.inventory.api.slot.CustomSlot;
-import net.Indyuce.mmoitems.MMOItems;
-import net.Indyuce.mmoitems.api.item.NBTItem;
-import net.Indyuce.mmoitems.api.player.PlayerData;
 
 public class PlayerInventoryView implements InventoryHolder {
 	private final InventoryData data;
 	private final Player player, target;
-	private final PlayerData playerData;
 
 	private static final List<InventoryAction> supported = Arrays.asList(InventoryAction.PICKUP_ALL, InventoryAction.SWAP_WITH_CURSOR, InventoryAction.PLACE_ALL);
 
@@ -35,7 +31,6 @@ public class PlayerInventoryView implements InventoryHolder {
 	public PlayerInventoryView(Player player, Player target) {
 		this.target = target;
 		this.player = player;
-		this.playerData = PlayerData.get(player);
 
 		data = MMOInventory.plugin.getDataManager().getInventory(player);
 	}
@@ -94,7 +89,7 @@ public class PlayerInventoryView implements InventoryHolder {
 		 * remove the slot item if the player tried to pick it up.
 		 */
 		if (!isAir(event.getCurrentItem())) {
-			NBTItem picked = MMOItems.plugin.getNMS().getNBTItem(event.getCurrentItem());
+			NBTItem picked = MMOInventory.plugin.getVersionWrapper().getNBTItem(event.getCurrentItem());
 			if (picked.hasTag("inventoryItem")) {
 				if (isAir(event.getCursor()) || picked.getString("inventoryItem").equals("FILL")) {
 					event.setCancelled(true);
@@ -115,14 +110,9 @@ public class PlayerInventoryView implements InventoryHolder {
 			}
 
 			data.setItem(slot, event.getCursor());
-			playerData.updateInventory();
 			if (isAir(event.getCursor()))
 				Bukkit.getScheduler().runTaskLater(MMOInventory.plugin, () -> event.getInventory().setItem(slot.getIndex(), slot.getItem()), 0);
 		}
-	}
-
-	public void whenClosed(InventoryCloseEvent event) {
-		playerData.updateInventory();
 	}
 
 	/*
