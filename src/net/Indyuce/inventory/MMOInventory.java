@@ -14,8 +14,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.Indyuce.inventory.api.ConfigFile;
-import net.Indyuce.inventory.command.RPGInventoryCommand;
-import net.Indyuce.inventory.command.RPGInventoryCompletion;
+import net.Indyuce.inventory.command.MMOInventoryCommand;
+import net.Indyuce.inventory.command.MMOInventoryCompletion;
 import net.Indyuce.inventory.comp.MMOItemsCompatibility;
 import net.Indyuce.inventory.listener.DeathDrops;
 import net.Indyuce.inventory.listener.GuiListener;
@@ -80,8 +80,8 @@ public class MMOInventory extends JavaPlugin implements Listener {
 				}
 			}, this);
 
-		getCommand("mmoinventory").setExecutor(new RPGInventoryCommand());
-		getCommand("mmoinventory").setTabCompleter(new RPGInventoryCompletion());
+		getCommand("mmoinventory").setExecutor(new MMOInventoryCommand());
+		getCommand("mmoinventory").setTabCompleter(new MMOInventoryCompletion());
 
 		Bukkit.getOnlinePlayers().forEach(player -> dataManager.loadInventory(player));
 
