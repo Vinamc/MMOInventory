@@ -16,13 +16,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 import net.Indyuce.inventory.api.ConfigFile;
 import net.Indyuce.inventory.command.RPGInventoryCommand;
 import net.Indyuce.inventory.command.RPGInventoryCompletion;
-import net.Indyuce.inventory.comp.MMOItemsPlayerInventory;
+import net.Indyuce.inventory.comp.MMOItemsCompatibility;
+import net.Indyuce.inventory.listener.DeathDrops;
 import net.Indyuce.inventory.listener.GuiListener;
 import net.Indyuce.inventory.listener.PlayerListener;
 import net.Indyuce.inventory.listener.ResourcePack;
 import net.Indyuce.inventory.manager.DataManager;
 import net.Indyuce.inventory.manager.SlotManager;
-import net.Indyuce.mmoitems.MMOItems;
+import net.Indyuce.inventory.version.ServerVersion;
+import net.Indyuce.inventory.version.wrapper.VersionWrapper;
 
 public class MMOInventory extends JavaPlugin implements Listener {
 	public static MMOInventory plugin;
@@ -30,6 +32,7 @@ public class MMOInventory extends JavaPlugin implements Listener {
 	private final DataManager dataManager = new DataManager();
 	private final SlotManager slotManager = new SlotManager();
 
+	private VersionWrapper versionWrapper;
 	private ConfigFile language;
 
 	/*
@@ -43,6 +46,16 @@ public class MMOInventory extends JavaPlugin implements Listener {
 
 	public void onEnable() {
 
+		ServerVersion version = new ServerVersion(Bukkit.getServer().getClass());
+		try {
+			getLogger().log(Level.INFO, "Detected Bukkit Version: " + version.toString());
+			versionWrapper = (VersionWrapper) Class.forName("net.Indyuce.inventory.version.wrapper.VersionWrapper_" + version.toString().substring(1)).newInstance();
+		} catch (Exception e) {
+			getLogger().log(Level.INFO, "Your server version is not compatible.");
+			Bukkit.getPluginManager().disablePlugin(this);
+			return;
+		}
+
 		saveDefaultConfig();
 		saveDefaultFile("language");
 		saveDefaultFile("items");
@@ -51,6 +64,9 @@ public class MMOInventory extends JavaPlugin implements Listener {
 		Bukkit.getServer().getPluginManager().registerEvents(this, this);
 		Bukkit.getServer().getPluginManager().registerEvents(new GuiListener(), this);
 		Bukkit.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+
+		if (getConfig().getBoolean("drop-on-death"))
+			Bukkit.getServer().getPluginManager().registerEvents(new DeathDrops(), this);
 
 		if (getConfig().getBoolean("resource-pack.enabled"))
 			Bukkit.getServer().getPluginManager().registerEvents(new ResourcePack(getConfig().getConfigurationSection("resource-pack")), this);
@@ -69,7 +85,10 @@ public class MMOInventory extends JavaPlugin implements Listener {
 
 		Bukkit.getOnlinePlayers().forEach(player -> dataManager.loadInventory(player));
 
-		MMOItems.plugin.setPlayerInventory(new MMOItemsPlayerInventory());
+		if (Bukkit.getPluginManager().getPlugin("MMOItems") != null) {
+			new MMOItemsCompatibility();
+			getLogger().log(Level.INFO, "Hooked onto MMOItems");
+		}
 	}
 
 	public void onDisable() {
@@ -94,6 +113,10 @@ public class MMOInventory extends JavaPlugin implements Listener {
 
 	public String getTranslation(String path) {
 		return ChatColor.translateAlternateColorCodes('&', language.getConfig().getString(path));
+	}
+
+	public VersionWrapper getVersionWrapper() {
+		return versionWrapper;
 	}
 
 	public DataManager getDataManager() {
