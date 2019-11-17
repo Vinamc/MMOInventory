@@ -13,6 +13,12 @@ import net.minecraft.server.v1_9_R2.NBTTagCompound;
 
 public class VersionWrapper_1_9_R2 implements VersionWrapper {
 
+	@Override
+	public boolean isHelmet(Material material) {
+		return material.name().endsWith("HELMET") || material == Material.PUMPKIN
+				|| material.name().equals("SKULL_ITEM");
+	}
+
 	@SuppressWarnings("deprecation")
 	@Override
 	public org.bukkit.inventory.ItemStack getModelItem(Material material, int model) {

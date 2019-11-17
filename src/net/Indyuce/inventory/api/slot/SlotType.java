@@ -18,15 +18,15 @@ public enum SlotType {
 
 		@Override
 		public boolean canEquip(ItemStack item) {
-			return item != null && (item.getType().name().endsWith("_HELMET") || item.getType() == Material.CARVED_PUMPKIN);
+			return item.getType().name().endsWith("_HELMET")
+					|| item.getType() == Material.CARVED_PUMPKIN;
 		}
 
 		@Override
 		public ItemStack retrieveItem(Player player) {
 			return player.getInventory().getHelmet();
 		}
-	}),
-	CHESTPLATE(new VanillaSlotHandler() {
+	}), CHESTPLATE(new VanillaSlotHandler() {
 
 		@Override
 		public void equip(Player player, ItemStack item) {
@@ -35,15 +35,14 @@ public enum SlotType {
 
 		@Override
 		public boolean canEquip(ItemStack item) {
-			return item != null && (item.getType().name().endsWith("_CHESTPLATE") || item.getType() == Material.ELYTRA);
+			return item.getType().name().endsWith("_CHESTPLATE") || item.getType() == Material.ELYTRA;
 		}
 
 		@Override
 		public ItemStack retrieveItem(Player player) {
 			return player.getInventory().getChestplate();
 		}
-	}),
-	LEGGINGS(new VanillaSlotHandler() {
+	}), LEGGINGS(new VanillaSlotHandler() {
 
 		@Override
 		public void equip(Player player, ItemStack item) {
@@ -59,8 +58,7 @@ public enum SlotType {
 		public ItemStack retrieveItem(Player player) {
 			return player.getInventory().getLeggings();
 		}
-	}),
-	BOOTS(new VanillaSlotHandler() {
+	}), BOOTS(new VanillaSlotHandler() {
 
 		@Override
 		public void equip(Player player, ItemStack item) {
@@ -76,8 +74,7 @@ public enum SlotType {
 		public ItemStack retrieveItem(Player player) {
 			return player.getInventory().getBoots();
 		}
-	}),
-	OFF_HAND(new VanillaSlotHandler() {
+	}), OFF_HAND(new VanillaSlotHandler() {
 
 		@Override
 		public void equip(Player player, ItemStack item) {
@@ -98,8 +95,7 @@ public enum SlotType {
 	/*
 	 * custom types
 	 */
-	ACCESSORY(null),
-	FILL(null);
+	ACCESSORY(null), FILL(null);
 
 	private final VanillaSlotHandler vanilla;
 

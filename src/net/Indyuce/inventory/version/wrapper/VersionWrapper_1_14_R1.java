@@ -14,8 +14,16 @@ import net.minecraft.server.v1_14_R1.NBTTagCompound;
 public class VersionWrapper_1_14_R1 implements VersionWrapper {
 
 	@Override
+	public boolean isHelmet(Material material) {
+		return material.name().endsWith("HELMET") || material == Material.CARVED_PUMPKIN
+				|| material == Material.PLAYER_HEAD || material == Material.CREEPER_HEAD
+				|| material == Material.SKELETON_SKULL || material == Material.WITHER_SKELETON_SKULL;
+	}
+
+	@Override
 	public org.bukkit.inventory.ItemStack getModelItem(Material material, int model) {
-		return new NBTItem_v1_14_R1(new org.bukkit.inventory.ItemStack(material)).addTag(new ItemTag("CustomModelData", model)).toItem();
+		return new NBTItem_v1_14_R1(new org.bukkit.inventory.ItemStack(material))
+				.addTag(new ItemTag("CustomModelData", model)).toItem();
 	}
 
 	@Override
