@@ -88,6 +88,6 @@ public class CustomSlot {
 	}
 
 	public boolean canEquip(ItemStack item) {
-		return getType().isCustom() || type.getVanillaSlotHandler().canEquip(item);
+		return getType().isCustom() || (item != null && type.getVanillaSlotHandler().canEquip(item));
 	}
 }

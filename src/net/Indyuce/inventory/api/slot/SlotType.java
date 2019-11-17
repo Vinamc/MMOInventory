@@ -4,6 +4,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import net.Indyuce.inventory.MMOInventory;
+
 public enum SlotType {
 
 	/*
@@ -18,8 +20,7 @@ public enum SlotType {
 
 		@Override
 		public boolean canEquip(ItemStack item) {
-			return item.getType().name().endsWith("_HELMET")
-					|| item.getType() == Material.CARVED_PUMPKIN;
+			return MMOInventory.plugin.getVersionWrapper().isHelmet(item.getType());
 		}
 
 		@Override
