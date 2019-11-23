@@ -9,7 +9,6 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import net.Indyuce.inventory.MMOInventory;
@@ -52,9 +51,6 @@ public class CustomSlot {
 		int model = config.contains("durability") ? config.getInt("durability") : config.getInt("custom-model-data");
 		ItemStack item = MMOInventory.plugin.getVersionWrapper().getModelItem(Material.valueOf(config.getString("material").toUpperCase().replace("-", "_").replace(" ", "_")), model);
 		ItemMeta meta = item.getItemMeta();
-		if (meta instanceof Damageable)
-			((Damageable) meta).setDamage((short) config.getInt("durability"));
-		meta.setUnbreakable(true);
 		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
 		meta.addItemFlags(ItemFlag.values());
 		List<String> lore = new ArrayList<>();
@@ -63,7 +59,7 @@ public class CustomSlot {
 		meta.setLore(lore);
 		item.setItemMeta(meta);
 
-		NBTItem nbt = MMOInventory.plugin.getVersionWrapper().getNBTItem(item).addTag(new ItemTag("inventoryItem", getId()));
+		NBTItem nbt = MMOInventory.plugin.getVersionWrapper().getNBTItem(item).addTag(new ItemTag("inventoryItem", getId()),new ItemTag("Unbreakable", true));
 		this.item = nbt.toItem();
 	}
 
@@ -92,6 +88,6 @@ public class CustomSlot {
 	}
 
 	public boolean canEquip(ItemStack item) {
-		return getType().isCustom() || type.getVanillaSlotHandler().canEquip(item);
+		return getType().isCustom() || (item != null && type.getVanillaSlotHandler().canEquip(item));
 	}
 }

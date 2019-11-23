@@ -32,7 +32,7 @@ public class MMOItemsCustomSlot extends CustomSlot {
 	@Override
 	public boolean canEquip(ItemStack item) {
 		if (!getType().isCustom())
-			return getType().getVanillaSlotHandler().canEquip(item);
+			return item != null && getType().getVanillaSlotHandler().canEquip(item);
 
 		Type type = NBTItem.get(item).getType();
 		return type != null && matches(type);
