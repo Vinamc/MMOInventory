@@ -102,7 +102,7 @@ public class PlayerInventoryView implements InventoryHolder {
 		}
 
 		if (slot != null) {
-
+			
 			/*
 			 * may be called with a null item if the player is unequipping an
 			 * item
