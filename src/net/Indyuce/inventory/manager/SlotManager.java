@@ -67,6 +67,8 @@ public class SlotManager {
 		Validate.notNull(slotLoader, "Slot loader must not be null");
 
 		this.slotLoader = slotLoader;
+		
+		reload();
 	}
 
 	public CustomSlot getFiller() {

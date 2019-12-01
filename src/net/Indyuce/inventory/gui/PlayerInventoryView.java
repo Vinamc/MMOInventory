@@ -94,7 +94,8 @@ public class PlayerInventoryView implements InventoryHolder {
 		}
 
 		/*
-		 * remove the slot item if the player tried to pick it up.
+		 * remove the slot item if the player tried to pick it up for any type
+		 * of custom slots.
 		 */
 		if (!isAir(event.getCurrentItem())) {
 			NBTItem picked = MMOInventory.plugin.getVersionWrapper().getNBTItem(event.getCurrentItem());
@@ -109,7 +110,11 @@ public class PlayerInventoryView implements InventoryHolder {
 		}
 
 		if (slot != null) {
-
+			
+			/*
+			 * may be called with a null item if the player is unequipping an
+			 * item
+			 */
 			ItemEquipEvent equipEvent = new ItemEquipEvent(player, event.getCursor(), slot);
 			Bukkit.getPluginManager().callEvent(equipEvent);
 			if (equipEvent.isCancelled()) {

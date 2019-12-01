@@ -59,7 +59,7 @@ public class CustomSlot {
 		meta.setLore(lore);
 		item.setItemMeta(meta);
 
-		NBTItem nbt = MMOInventory.plugin.getVersionWrapper().getNBTItem(item).addTag(new ItemTag("inventoryItem", getId()),new ItemTag("Unbreakable", true));
+		NBTItem nbt = MMOInventory.plugin.getVersionWrapper().getNBTItem(item).addTag(new ItemTag("inventoryItem", getId()), new ItemTag("Unbreakable", true));
 		this.item = nbt.toItem();
 	}
 
