@@ -16,6 +16,11 @@ no-custom-inventory: false
 # Requires a server reload when changed.
 drop-on-death: true
 
+# MMOItems ornaments support. Costs extra performance because
+# MI loops through the entire player's inventory to check for ornaments.
+# Requires a server reload when changed.
+ornaments-support: false
+
 # Enable/disable auto resource pack download. Requires a server reload when changed.
 # Default RP: https://www.dropbox.com/s/rq550yj7iebwixl/mmoinventory_rp.zip?dl=1
 resource-pack:
