@@ -66,6 +66,14 @@ public class PlayerInventoryView implements InventoryHolder {
 
 	public void whenClicked(InventoryClickEvent event) {
 
+		/*
+		 * cannot change inventory when it's not yours
+		 */
+		if (!target.equals(player)) {
+			event.setCancelled(true);
+			return;
+		}
+		
 		if (!supported.contains(event.getAction())) {
 			event.setCancelled(true);
 			return;
