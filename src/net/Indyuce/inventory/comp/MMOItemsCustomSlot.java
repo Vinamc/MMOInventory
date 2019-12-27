@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import net.Indyuce.inventory.api.slot.CustomSlot;
 import net.Indyuce.inventory.api.slot.SlotType;
 import net.Indyuce.mmoitems.api.Type;
-import net.Indyuce.mmoitems.api.item.NBTItem;
+import net.mmogroup.mmolib.api.item.NBTItem;
 
 public class MMOItemsCustomSlot extends CustomSlot {
 	private String mmoitemsType;
