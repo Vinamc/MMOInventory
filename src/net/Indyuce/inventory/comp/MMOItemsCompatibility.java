@@ -43,7 +43,7 @@ public class MMOItemsCompatibility implements PlayerInventory, Listener {
 
 		for (ItemStack armor : player.getInventory().getArmorContents())
 			list.add(new EquippedItem(armor, EquipmentSlot.ARMOR));
-
+		
 		MMOInventory.plugin.getDataManager().getInventory(player).getExtraItems().forEach(item -> list.add(new EquippedItem(item, EquipmentSlot.ACCESSORY)));
 
 		return list;

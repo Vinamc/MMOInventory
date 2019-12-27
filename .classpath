@@ -2,8 +2,8 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="D:/Documents/Coding/Java/Minecraft Plugins/lib/MMOItems.jar"/>
 	<classpathentry kind="lib" path="D:/Documents/Coding/Java/Minecraft Plugins/lib/spigot.jar"/>
+	<classpathentry kind="lib" path="D:/Documents/Coding/Java/Minecraft Plugins/lib/MMOItems.jar"/>
 	<classpathentry kind="lib" path="D:/Documents/Coding/Java/Minecraft Plugins/lib/MMOLib.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
