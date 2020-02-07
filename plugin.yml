@@ -3,6 +3,7 @@ version: 1.1.6
 main: net.Indyuce.inventory.MMOInventory
 author: Indyuce
 api-version: 1.13
+softdepend: [MMOInventory]
 commands:
     mmoinventory:
         description: Opens the custom inventory.

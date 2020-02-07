@@ -2,8 +2,20 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="D:/Documents/Coding/Java/Minecraft Plugins/lib/spigot.jar"/>
-	<classpathentry kind="lib" path="D:/Documents/Coding/Java/Minecraft Plugins/lib/MMOItems.jar"/>
-	<classpathentry kind="lib" path="D:/Documents/Coding/Java/Minecraft Plugins/lib/MMOLib.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/MMOLib"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/MMOItems"/>
+	<classpathentry kind="lib" path="C:/Users/cympe/eclipse/spigot-1.14.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/cympe/eclipse/spigot-1.13.2.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/Users/cympe/eclipse/BuildTools/Spigot/Spigot-API/src/main/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/cympe/eclipse/spigot-1.13.jar"/>
+	<classpathentry kind="lib" path="C:/Users/cympe/eclipse/spigot-1.12.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/cympe/eclipse/spigot-1.11.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/cympe/eclipse/spigot-1.10.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/cympe/eclipse/spigot-1.9.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/cympe/eclipse/spigot-1.9.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/cympe/eclipse/spigot-1.15.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
