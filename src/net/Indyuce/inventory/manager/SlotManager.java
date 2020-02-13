@@ -94,6 +94,7 @@ public class SlotManager {
 				register(new CustomSlot(section));
 			} catch (IllegalArgumentException exception) {
 				MMOInventory.plugin.getLogger().log(Level.WARNING, "Could not load slot " + key + ": " + exception.getMessage());
+				exception.printStackTrace();
 			}
 
 		MMOInventory.plugin.getLogger().log(Level.INFO, "Successfully registered " + slots.size() + " inventory slots.");

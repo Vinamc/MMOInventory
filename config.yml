@@ -22,7 +22,8 @@ drop-on-death: true
 ornaments-support: false
 
 # Enable/disable auto resource pack download. Requires a server reload when changed.
-# Default RP: https://www.dropbox.com/s/rq550yj7iebwixl/mmoinventory_rp.zip?dl=1
+# Default RP for <1.13: https://www.dropbox.com/s/rq550yj7iebwixl/mmoinventory_rp.zip?dl=1
+# Default RP for 1.14+: https://www.dropbox.com/s/glkg7543n74lui1/mmoinv_rp_newest.zip?dl=1
 resource-pack:
     enabled: true
     url: resource_pack_url

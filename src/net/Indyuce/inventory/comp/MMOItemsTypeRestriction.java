@@ -1,6 +1,5 @@
 package net.Indyuce.inventory.comp;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -8,20 +7,22 @@ import net.Indyuce.inventory.api.InventoryData;
 import net.Indyuce.inventory.api.LineConfig;
 import net.Indyuce.inventory.api.slot.CustomSlot;
 import net.Indyuce.inventory.api.slot.SlotRestriction;
-import net.Indyuce.mmoitems.MMOItems;
 import net.Indyuce.mmoitems.api.Type;
 import net.mmogroup.mmolib.api.item.NBTItem;
 
 public class MMOItemsTypeRestriction extends SlotRestriction {
-	private final Type type;
+
+	/*
+	 * forced to save the mmoitems type as a string and not a type instance
+	 * because the TypeManager has not been initialized yet
+	 */
+	private final String id;
 
 	public MMOItemsTypeRestriction(LineConfig config) {
 		super(config);
 
 		config.validate("type");
-		String format = config.getString("type").toUpperCase().replace("-", "_").replace(" ", "_");
-		Validate.isTrue(MMOItems.plugin.getTypes().has(format));
-		type = MMOItems.plugin.getTypes().get(format);
+		id = config.getString("type").toUpperCase().replace("-", "_").replace(" ", "_");
 	}
 
 	@Override
@@ -30,10 +31,10 @@ public class MMOItemsTypeRestriction extends SlotRestriction {
 			return item != null && slot.getType().getVanillaSlotHandler().canEquip(item);
 
 		Type type = NBTItem.get(item).getType();
-		return type != null && this.type.equals(type);
+		return type != null && id.equals(type.getId());
 	}
 
-	public Type getType() {
-		return type;
+	public String getType() {
+		return id;
 	}
 }
