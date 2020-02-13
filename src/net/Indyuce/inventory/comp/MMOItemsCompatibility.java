@@ -25,7 +25,6 @@ import net.mmogroup.mmolib.api.item.NBTItem;
 public class MMOItemsCompatibility implements PlayerInventory, Listener {
 	public MMOItemsCompatibility() {
 		Bukkit.getPluginManager().registerEvents(this, MMOInventory.plugin);
-//		MMOInventory.plugin.getSlotManager().setSlotLoader(config -> new MMOItemsCustomSlot(config));
 
 		/*
 		 * register with delay because MMOInventory does not always enable after

@@ -6,13 +6,13 @@ import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.api.InventoryData;
 import net.Indyuce.inventory.api.LineConfig;
-import net.Indyuce.inventory.api.restrict.Restriction;
 import net.Indyuce.inventory.api.slot.CustomSlot;
+import net.Indyuce.inventory.api.slot.SlotRestriction;
 import net.Indyuce.mmoitems.MMOItems;
 import net.Indyuce.mmoitems.api.Type;
 import net.mmogroup.mmolib.api.item.NBTItem;
 
-public class MMOItemsTypeRestriction extends Restriction {
+public class MMOItemsTypeRestriction extends SlotRestriction {
 	private final Type type;
 
 	public MMOItemsTypeRestriction(LineConfig config) {

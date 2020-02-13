@@ -1,16 +1,15 @@
-package net.Indyuce.inventory.api.restrict;
+package net.Indyuce.inventory.api.slot;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.api.InventoryData;
 import net.Indyuce.inventory.api.LineConfig;
-import net.Indyuce.inventory.api.slot.CustomSlot;
 
-public abstract class Restriction {
+public abstract class SlotRestriction {
 	private final LineConfig config;
 
-	public Restriction(LineConfig config) {
+	public SlotRestriction(LineConfig config) {
 		this.config = config;
 	}
 

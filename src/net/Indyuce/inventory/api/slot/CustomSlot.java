@@ -14,7 +14,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.api.LineConfig;
 import net.Indyuce.inventory.api.NBTItem;
-import net.Indyuce.inventory.api.restrict.Restriction;
 import net.Indyuce.inventory.version.ItemTag;
 
 public class CustomSlot {
@@ -28,7 +27,7 @@ public class CustomSlot {
 	 * slot restrictions used by external plugins to apply type, class
 	 * restrictions, etc.
 	 */
-	private final List<Restriction> restrictions = new ArrayList<>();
+	private final List<SlotRestriction> restrictions = new ArrayList<>();
 
 	/*
 	 * may be used to register custom slots using other plugins
@@ -97,7 +96,7 @@ public class CustomSlot {
 		return item;
 	}
 
-	public List<Restriction> getRestrictions() {
+	public List<SlotRestriction> getRestrictions() {
 		return restrictions;
 	}
 }

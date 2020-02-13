@@ -90,6 +90,7 @@ public class MMOInventory extends JavaPlugin implements Listener {
 		getCommand("mmoinventory").setExecutor(new MMOInventoryCommand());
 		getCommand("mmoinventory").setTabCompleter(new MMOInventoryCompletion());
 
+		// /reload friendly
 		Bukkit.getOnlinePlayers().forEach(player -> dataManager.loadInventory(player));
 
 		if (Bukkit.getPluginManager().getPlugin("MMOItems") != null) {

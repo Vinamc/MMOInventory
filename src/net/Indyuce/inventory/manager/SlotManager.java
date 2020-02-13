@@ -17,8 +17,8 @@ import org.bukkit.inventory.ItemStack;
 import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.api.ConfigFile;
 import net.Indyuce.inventory.api.LineConfig;
-import net.Indyuce.inventory.api.restrict.Restriction;
 import net.Indyuce.inventory.api.slot.CustomSlot;
+import net.Indyuce.inventory.api.slot.SlotRestriction;
 import net.Indyuce.inventory.api.slot.SlotType;
 
 public class SlotManager {
@@ -31,7 +31,7 @@ public class SlotManager {
 	/*
 	 * used to register extra slot restrictions from external plugins
 	 */
-	private final Map<String, Function<LineConfig, Restriction>> restrictionLoader = new HashMap<>();
+	private final Map<String, Function<LineConfig, SlotRestriction>> restrictionLoader = new HashMap<>();
 
 	/*
 	 * used to fill up inventory space
@@ -58,7 +58,7 @@ public class SlotManager {
 		return slots.values();
 	}
 
-	public Restriction readRestriction(LineConfig config) {
+	public SlotRestriction readRestriction(LineConfig config) {
 		String id = config.getKey().toLowerCase().replace("-", "_").replace(" ", "_");
 
 		for (String check : restrictionLoader.keySet())
@@ -68,7 +68,7 @@ public class SlotManager {
 		throw new IllegalArgumentException("Could not find restriction with ID " + config.getKey());
 	}
 
-	public void registerRestriction(Function<LineConfig, Restriction> function, String... ids) {
+	public void registerRestriction(Function<LineConfig, SlotRestriction> function, String... ids) {
 		Validate.notNull(function, "Function must not be null.");
 
 		for (String id : ids) {
