@@ -16,6 +16,7 @@ import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.api.InventoryData;
 import net.Indyuce.inventory.api.NBTItem;
 import net.Indyuce.inventory.api.event.ItemEquipEvent;
+import net.Indyuce.inventory.api.restrict.Restriction;
 import net.Indyuce.inventory.api.slot.CustomSlot;
 
 public class PlayerInventoryView implements InventoryHolder {
@@ -66,31 +67,39 @@ public class PlayerInventoryView implements InventoryHolder {
 
 	public void whenClicked(InventoryClickEvent event) {
 
-		/*
-		 * cannot change inventory when it's not yours
-		 */
+		// cannot change inventory when it's not yours
 		if (!target.equals(player)) {
 			event.setCancelled(true);
 			return;
 		}
-		
+
 		if (!supported.contains(event.getAction())) {
 			event.setCancelled(true);
 			return;
 		}
 
-		/*
-		 * cannot put items in the filler slots (BUG FIX)
-		 */
+		// cannot put items in the filler slots (BUG FIX)
 		if (!isAir(event.getCurrentItem()) && event.getCurrentItem().isSimilar(MMOInventory.plugin.getSlotManager().getFiller().getItem())) {
 			event.setCancelled(true);
 			return;
 		}
 
+		// check if item can be equipped (apply slot restrictions)
 		CustomSlot slot = MMOInventory.plugin.getSlotManager().get(event.getRawSlot());
-		if (slot != null && !isAir(event.getCursor()) && !slot.canEquip(event.getCursor())) {
-			event.setCancelled(true);
-			return;
+		if (slot != null && !isAir(event.getCursor())) {
+
+			// vanilla slots requirements check
+			if (!slot.getType().isCustom() && !slot.getType().getVanillaSlotHandler().canEquip(event.getCursor())) {
+				event.setCancelled(true);
+				return;
+			}
+
+			// check for custom slot restrictions
+			for (Restriction restriction : slot.getRestrictions())
+				if (!restriction.isVerified(player, data, slot, event.getCursor())) {
+					event.setCancelled(true);
+					return;
+				}
 		}
 
 		/*
@@ -110,7 +119,7 @@ public class PlayerInventoryView implements InventoryHolder {
 		}
 
 		if (slot != null) {
-			
+
 			/*
 			 * may be called with a null item if the player is unequipping an
 			 * item
@@ -128,9 +137,7 @@ public class PlayerInventoryView implements InventoryHolder {
 		}
 	}
 
-	/*
-	 * checks for both null and AIR material
-	 */
+	// checks for both null and AIR material
 	private boolean isAir(ItemStack item) {
 		return item == null || item.getType() == Material.AIR;
 	}

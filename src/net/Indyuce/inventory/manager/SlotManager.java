@@ -16,6 +16,8 @@ import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.api.ConfigFile;
+import net.Indyuce.inventory.api.LineConfig;
+import net.Indyuce.inventory.api.restrict.Restriction;
 import net.Indyuce.inventory.api.slot.CustomSlot;
 import net.Indyuce.inventory.api.slot.SlotType;
 
@@ -27,12 +29,9 @@ public class SlotManager {
 	private final Map<Integer, CustomSlot> slots = new HashMap<>();
 
 	/*
-	 * used by external plugins to load slot instances differently/different
-	 * instances. best option is to create a class which extends CustomSlot and
-	 * make these class register using this function. this function is called
-	 * WHENEVER MMOInventory reads a config section from items.yml
+	 * used to register extra slot restrictions from external plugins
 	 */
-	private Function<ConfigurationSection, CustomSlot> slotLoader = config -> new CustomSlot(config);
+	private final Map<String, Function<LineConfig, Restriction>> restrictionLoader = new HashMap<>();
 
 	/*
 	 * used to fill up inventory space
@@ -40,11 +39,7 @@ public class SlotManager {
 	private CustomSlot fill = new CustomSlot("FILL", "", SlotType.FILL, -1, new ItemStack(Material.AIR));
 
 	public void register(CustomSlot slot) {
-
-		if (slots.containsKey(slot.getIndex())) {
-			MMOInventory.plugin.getLogger().log(Level.WARNING, "Attempted to register two slots (" + slot.getName() + ") with the same inventory index.");
-			return;
-		}
+		Validate.isTrue(!slots.containsKey(slot.getIndex()), "Attempted to register two slots (" + slot.getName() + ") with the same inventory index.");
 
 		slots.put(slot.getIndex(), slot);
 		if (slot.getType() == SlotType.FILL)
@@ -63,12 +58,24 @@ public class SlotManager {
 		return slots.values();
 	}
 
-	public void setSlotLoader(Function<ConfigurationSection, CustomSlot> slotLoader) {
-		Validate.notNull(slotLoader, "Slot loader must not be null");
+	public Restriction readRestriction(LineConfig config) {
+		String id = config.getKey().toLowerCase().replace("-", "_").replace(" ", "_");
 
-		this.slotLoader = slotLoader;
-		
-		reload();
+		for (String check : restrictionLoader.keySet())
+			if (check.equals(id))
+				return restrictionLoader.get(check).apply(config);
+
+		throw new IllegalArgumentException("Could not find restriction with ID " + config.getKey());
+	}
+
+	public void registerRestriction(Function<LineConfig, Restriction> function, String... ids) {
+		Validate.notNull(function, "Function must not be null.");
+
+		for (String id : ids) {
+			id = id.toLowerCase().replace("-", "_").replace(" ", "_");
+			Validate.isTrue(!restrictionLoader.containsKey(id), "Database already contains a restriction with ID " + id);
+			restrictionLoader.put(id, function);
+		}
 	}
 
 	public CustomSlot getFiller() {
@@ -84,7 +91,7 @@ public class SlotManager {
 				ConfigurationSection section = config.getConfigurationSection(key);
 				Validate.notNull(section, "Could not read config section");
 
-				register(slotLoader.apply(section));
+				register(new CustomSlot(section));
 			} catch (IllegalArgumentException exception) {
 				MMOInventory.plugin.getLogger().log(Level.WARNING, "Could not load slot " + key + ": " + exception.getMessage());
 			}

@@ -48,7 +48,8 @@ RIGHT_RING:
     durability: 7
     name: '&6Right Ring Slot'
     slot: 25
-    mmoitems-type: ring
+    restrictions:
+    - 'mmoitemstype{type=RING}'
     lore:
     - Drag & drop an item to equip it.
 LEFT_RING:
@@ -57,7 +58,8 @@ LEFT_RING:
     durability: 8
     name: '&6Left Ring Slot'
     slot: 34
-    mmoitems-type: ring
+    restrictions:
+    - 'mmoitemstype{type=RING}'
     lore:
     - Drag & drop an item to equip it.
 
@@ -68,7 +70,8 @@ AMULET:
     durability: 5
     name: '&6Amulet Slot'
     slot: 7
-    mmoitems-type: amulet
+    restrictions:
+    - 'mmoitemstype{type=AMULET}'
     lore:
     - Drag & drop an item to equip it.
 BRACELET:
@@ -77,7 +80,8 @@ BRACELET:
     durability: 6
     name: '&6Bracelet Slot'
     slot: 16
-    mmoitems-type: bracelet
+    restrictions:
+    - 'mmoitemstype{type=BRACELET}'
     lore:
     - Drag & drop an item to equip it.
 GLOVES:
@@ -86,7 +90,8 @@ GLOVES:
     durability: 9
     name: '&6Gloves Slot'
     slot: 1
-    mmoitems-type: gloves
+    restrictions:
+    - 'mmoitemstype{type=GLOVES}'
     lore:
     - Drag & drop an item to equip it.
 
@@ -97,7 +102,8 @@ ARTIFACT_1:
     durability: 10
     name: '&6Artifact Slot I'
     slot: 10
-    mmoitems-type: artifact
+    restrictions:
+    - 'mmoitemstype{type=ARTIFACT}'
     lore:
     - Drag & drop an item to equip it.
 ARTIFACT_2:
@@ -106,7 +112,8 @@ ARTIFACT_2:
     durability: 11
     name: '&6Artifact Slot II'
     slot: 19
-    mmoitems-type: artifact
+    restrictions:
+    - 'mmoitemstype{type=ARTIFACT}'
     lore:
     - Drag & drop an item to equip it.
 ARTIFACT_3:
@@ -115,7 +122,8 @@ ARTIFACT_3:
     durability: 12
     name: '&6Artifact Slot III'
     slot: 28
-    mmoitems-type: artifact
+    restrictions:
+    - 'mmoitemstype{type=ARTIFACT}'
     lore:
     - Drag & drop an item to equip it.
 

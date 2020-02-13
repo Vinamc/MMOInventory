@@ -17,6 +17,7 @@ import net.Indyuce.inventory.api.ConfigFile;
 import net.Indyuce.inventory.command.MMOInventoryCommand;
 import net.Indyuce.inventory.command.MMOInventoryCompletion;
 import net.Indyuce.inventory.comp.MMOItemsCompatibility;
+import net.Indyuce.inventory.comp.MMOItemsTypeRestriction;
 import net.Indyuce.inventory.listener.DeathDrops;
 import net.Indyuce.inventory.listener.GuiListener;
 import net.Indyuce.inventory.listener.PlayerListener;
@@ -42,6 +43,12 @@ public class MMOInventory extends JavaPlugin implements Listener {
 
 	public MMOInventory() {
 		plugin = this;
+	}
+
+	public void onLoad() {
+
+		if (Bukkit.getPluginManager().getPlugin("MMOItems") != null)
+			slotManager.registerRestriction(config -> new MMOItemsTypeRestriction(config), "mmoitemstype", "mmoitemtype", "mitype", "mmoitem", "mmoitems");
 	}
 
 	public void onEnable() {
@@ -111,10 +118,6 @@ public class MMOInventory extends JavaPlugin implements Listener {
 		}
 	}
 
-	public String getTranslation(String path) {
-		return ChatColor.translateAlternateColorCodes('&', language.getConfig().getString(path));
-	}
-
 	public VersionWrapper getVersionWrapper() {
 		return versionWrapper;
 	}
@@ -125,6 +128,10 @@ public class MMOInventory extends JavaPlugin implements Listener {
 
 	public SlotManager getSlotManager() {
 		return slotManager;
+	}
+
+	public String getTranslation(String path) {
+		return ChatColor.translateAlternateColorCodes('&', language.getConfig().getString(path));
 	}
 
 	private void saveDefaultFile(String path) {
