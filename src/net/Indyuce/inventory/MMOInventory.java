@@ -17,6 +17,7 @@ import net.Indyuce.inventory.api.ConfigFile;
 import net.Indyuce.inventory.command.MMOInventoryCommand;
 import net.Indyuce.inventory.command.MMOInventoryCompletion;
 import net.Indyuce.inventory.comp.MMOItemsCompatibility;
+import net.Indyuce.inventory.comp.MMOItemsLevelRestriction;
 import net.Indyuce.inventory.comp.MMOItemsTypeRestriction;
 import net.Indyuce.inventory.listener.DeathDrops;
 import net.Indyuce.inventory.listener.GuiListener;
@@ -47,8 +48,10 @@ public class MMOInventory extends JavaPlugin implements Listener {
 
 	public void onLoad() {
 
-		if (Bukkit.getPluginManager().getPlugin("MMOItems") != null)
-			slotManager.registerRestriction(config -> new MMOItemsTypeRestriction(config), "mmoitemstype", "mmoitemtype", "mitype", "mmoitem", "mmoitems");
+		if (Bukkit.getPluginManager().getPlugin("MMOItems") != null) {
+			slotManager.registerRestriction(config -> new MMOItemsTypeRestriction(config), "mmoitemstype", "mmoitemtype", "mitype");
+			slotManager.registerRestriction(config -> new MMOItemsLevelRestriction(config), "mmoitemslevel", "mmoitemlevel", "milevel");
+		}
 	}
 
 	public void onEnable() {
