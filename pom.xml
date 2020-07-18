@@ -37,21 +37,21 @@
 			<artifactId>mmoitems</artifactId>
 			<version>5.1.2</version>
 			<scope>system</scope>
-			<systemPath>${basedir}/../mmolib/lib/MMOItems.jar</systemPath>
+			<systemPath>${basedir}/lib/MMOItems.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>net.Indyuce</groupId>
 			<artifactId>MMOLib</artifactId>
 			<version>1.0</version>
 			<scope>system</scope>
-			<systemPath>${basedir}/../mmolib/lib/MMOLib.jar</systemPath>
+			<systemPath>${basedir}/lib/MMOLib.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
 			<version>1.14.4</version>
 			<scope>system</scope>
-			<systemPath>${basedir}/../mmolib/lib/spigot.jar</systemPath>
+			<systemPath>${basedir}/lib/spigot.jar</systemPath>
 		</dependency>
 	</dependencies>
 </project>
