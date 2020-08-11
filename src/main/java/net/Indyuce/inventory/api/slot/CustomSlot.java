@@ -61,7 +61,7 @@ public class CustomSlot {
 
 		Validate.notNull(config.getString("type"), "Could not read slot type");
 		type = SlotType.valueOf(config.getString("type").toUpperCase().replace("-", "_").replace(" ", "_"));
-		slot = config.getInt("slot");
+		slot = type == SlotType.FILL ? -1 : config.getInt("slot");
 
 		// cache slot item
 		Validate.notNull(name = config.getString("name"), "Could not read slot name");
