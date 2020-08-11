@@ -1,6 +1,7 @@
 package net.Indyuce.inventory.listener;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -9,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -110,6 +112,19 @@ public class NoCustomInventory implements Listener {
 
 		if (isAir(event.getCursor()))
 			Bukkit.getScheduler().runTask(MMOInventory.plugin, () -> player.getInventory().setItem(slot.getIndex(), slot.getItem()));
+	}
+
+	@EventHandler
+	public void removeGuiDrops(PlayerDeathEvent event) {
+		if (event.getKeepInventory())
+			return;
+
+		Iterator<ItemStack> iterator = event.getDrops().iterator();
+		while (iterator.hasNext()) {
+			ItemStack next = iterator.next();
+			if (NBTItem.get(next).hasTag("MMOInventoryGuiItem"))
+				iterator.remove();
+		}
 	}
 
 	// checks for both null and AIR material
