@@ -15,14 +15,14 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.MMOInventory;
-import net.Indyuce.inventory.api.InventoryData;
 import net.Indyuce.inventory.api.NBTItem;
 import net.Indyuce.inventory.api.event.ItemEquipEvent;
+import net.Indyuce.inventory.api.inventory.InventoryHandler;
 import net.Indyuce.inventory.api.slot.CustomSlot;
 import net.Indyuce.inventory.api.slot.SlotRestriction;
 import net.Indyuce.inventory.api.slot.SlotType;
 
-public class VanillaInventorySlots implements Listener {
+public class NoCustomInventory implements Listener {
 	private static final List<InventoryAction> supported = Arrays.asList(InventoryAction.PICKUP_ALL, InventoryAction.SWAP_WITH_CURSOR,
 			InventoryAction.PLACE_ALL);
 
@@ -60,7 +60,7 @@ public class VanillaInventorySlots implements Listener {
 		}
 
 		Player player = (Player) event.getWhoClicked();
-		InventoryData data = MMOInventory.plugin.getDataManager().getInventory(player);
+		InventoryHandler data = MMOInventory.plugin.getDataManager().getInventory(player);
 
 		// check if item can be equipped (apply slot restrictions)
 		if (!isAir(event.getCursor())) {
@@ -104,7 +104,6 @@ public class VanillaInventorySlots implements Listener {
 		if (picked.hasTag("MMOInventoryGuiItem"))
 			event.setCurrentItem(null);
 
-		data.setItem(slot, event.getCursor());
 		if (isAir(event.getCursor()))
 			Bukkit.getScheduler().runTask(MMOInventory.plugin, () -> player.getInventory().setItem(slot.getIndex(), slot.getItem()));
 	}

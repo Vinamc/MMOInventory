@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.Indyuce.inventory.api.ConfigFile;
+import net.Indyuce.inventory.api.inventory.SimpleInventoryHandler;
 import net.Indyuce.inventory.command.MMOInventoryCommand;
 import net.Indyuce.inventory.command.MMOInventoryCompletion;
 import net.Indyuce.inventory.comp.MMOItemsCompatibility;
@@ -19,6 +20,7 @@ import net.Indyuce.inventory.comp.MMOItemsLevelRestriction;
 import net.Indyuce.inventory.comp.MMOItemsTypeRestriction;
 import net.Indyuce.inventory.listener.DeathDrops;
 import net.Indyuce.inventory.listener.GuiListener;
+import net.Indyuce.inventory.listener.NoCustomInventory;
 import net.Indyuce.inventory.listener.PlayerListener;
 import net.Indyuce.inventory.listener.ResourcePack;
 import net.Indyuce.inventory.listener.SaveOnLeave;
@@ -72,24 +74,25 @@ public class MMOInventory extends JavaPlugin implements Listener {
 		Bukkit.getServer().getPluginManager().registerEvents(new GuiListener(), this);
 		Bukkit.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
-		if (getConfig().getBoolean("drop-on-death"))
-			Bukkit.getServer().getPluginManager().registerEvents(new DeathDrops(), this);
-
 		if (getConfig().getBoolean("resource-pack.enabled"))
 			Bukkit.getServer().getPluginManager().registerEvents(new ResourcePack(getConfig().getConfigurationSection("resource-pack")), this);
 
 		if (getConfig().getBoolean("save-on-leave"))
 			Bukkit.getPluginManager().registerEvents(new SaveOnLeave(), this);
 
-		// if (getConfig().getBoolean("no-custom-inventory"))
-		// Bukkit.getPluginManager().registerEvents(new VanillaInventorySlots(),
-		// this);
+		if (getConfig().getBoolean("no-custom-inventory")) {
+			dataManager.setInventoryProvider(player -> new SimpleInventoryHandler(player));
+			Bukkit.getPluginManager().registerEvents(new NoCustomInventory(), this);
+		} 
+
+		else if (getConfig().getBoolean("drop-on-death"))
+			Bukkit.getServer().getPluginManager().registerEvents(new DeathDrops(), this);
 
 		getCommand("mmoinventory").setExecutor(new MMOInventoryCommand());
 		getCommand("mmoinventory").setTabCompleter(new MMOInventoryCompletion());
 
 		// /reload friendly
-		Bukkit.getOnlinePlayers().forEach(player -> dataManager.loadInventory(player));
+		Bukkit.getOnlinePlayers().forEach(player -> dataManager.setupData(player));
 
 		if (Bukkit.getPluginManager().getPlugin("MMOItems") != null) {
 			new MMOItemsCompatibility();
@@ -98,7 +101,7 @@ public class MMOInventory extends JavaPlugin implements Listener {
 	}
 
 	public void onDisable() {
-		dataManager.getLoaded().forEach(data -> data.save());
+		dataManager.getLoaded().forEach(data -> data.whenSaved());
 	}
 
 	public void reload() {

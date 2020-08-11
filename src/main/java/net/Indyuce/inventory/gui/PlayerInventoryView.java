@@ -13,15 +13,15 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.MMOInventory;
-import net.Indyuce.inventory.api.InventoryData;
 import net.Indyuce.inventory.api.NBTItem;
 import net.Indyuce.inventory.api.event.ItemEquipEvent;
+import net.Indyuce.inventory.api.inventory.CustomInventoryHandler;
 import net.Indyuce.inventory.api.slot.CustomSlot;
 import net.Indyuce.inventory.api.slot.SlotRestriction;
 import net.Indyuce.inventory.api.slot.SlotType;
 
 public class PlayerInventoryView implements InventoryHolder {
-	private final InventoryData data;
+	private final CustomInventoryHandler data;
 	private final Player player, target;
 
 	private static final List<InventoryAction> supported = Arrays.asList(InventoryAction.PICKUP_ALL, InventoryAction.SWAP_WITH_CURSOR,
@@ -35,7 +35,7 @@ public class PlayerInventoryView implements InventoryHolder {
 		this.target = target;
 		this.player = player;
 
-		data = MMOInventory.plugin.getDataManager().getInventory(player);
+		data = (CustomInventoryHandler) MMOInventory.plugin.getDataManager().getInventory(player);
 	}
 
 	@Override

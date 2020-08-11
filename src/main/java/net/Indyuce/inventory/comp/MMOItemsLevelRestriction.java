@@ -2,8 +2,8 @@ package net.Indyuce.inventory.comp;
 
 import org.bukkit.inventory.ItemStack;
 
-import net.Indyuce.inventory.api.InventoryData;
 import net.Indyuce.inventory.api.LineConfig;
+import net.Indyuce.inventory.api.inventory.InventoryHandler;
 import net.Indyuce.inventory.api.slot.CustomSlot;
 import net.Indyuce.inventory.api.slot.SlotRestriction;
 import net.Indyuce.mmoitems.api.player.PlayerData;
@@ -19,7 +19,7 @@ public class MMOItemsLevelRestriction extends SlotRestriction {
 	}
 
 	@Override
-	public boolean isVerified(InventoryData data, CustomSlot slot, ItemStack item) {
-		return PlayerData.get(data.getPlayer()).getRPG().canUse(NBTItem.get(item), false);
+	public boolean isVerified(InventoryHandler provider, CustomSlot slot, ItemStack item) {
+		return PlayerData.get(provider.getPlayer()).getRPG().canUse(NBTItem.get(item), false);
 	}
 }

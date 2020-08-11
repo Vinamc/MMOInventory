@@ -2,8 +2,8 @@ package net.Indyuce.inventory.comp;
 
 import org.bukkit.inventory.ItemStack;
 
-import net.Indyuce.inventory.api.InventoryData;
 import net.Indyuce.inventory.api.LineConfig;
+import net.Indyuce.inventory.api.inventory.InventoryHandler;
 import net.Indyuce.inventory.api.slot.CustomSlot;
 import net.Indyuce.inventory.api.slot.SlotRestriction;
 import net.Indyuce.mmoitems.api.Type;
@@ -26,7 +26,7 @@ public class MMOItemsTypeRestriction extends SlotRestriction {
 	}
 
 	@Override
-	public boolean isVerified(InventoryData data, CustomSlot slot, ItemStack item) {
+	public boolean isVerified(InventoryHandler provider, CustomSlot slot, ItemStack item) {
 		Type type = NBTItem.get(item).getType();
 		return type != null && id.equals(type.getId());
 	}

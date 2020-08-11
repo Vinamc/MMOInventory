@@ -10,7 +10,7 @@ public class SaveOnLeave implements Listener {
 
 	@EventHandler
 	public void saveOnLeave(PlayerQuitEvent event) {
-		MMOInventory.plugin.getDataManager().getInventory(event.getPlayer()).save();
-		MMOInventory.plugin.getDataManager().unload(event.getPlayer());
+		MMOInventory.plugin.getDataManager().getInventory(event.getPlayer()).whenSaved();
+		MMOInventory.plugin.getDataManager().unloadData(event.getPlayer());
 	}
 }

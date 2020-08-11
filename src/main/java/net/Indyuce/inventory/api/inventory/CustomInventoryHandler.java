@@ -1,4 +1,4 @@
-package net.Indyuce.inventory.api;
+package net.Indyuce.inventory.api.inventory;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,16 +13,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.MMOInventory;
+import net.Indyuce.inventory.api.ConfigFile;
 import net.Indyuce.inventory.api.slot.CustomSlot;
 import net.Indyuce.inventory.api.slot.SlotType;
 
-public class InventoryData {
-
-	/*
-	 * player instance not final because it needs to be updated every time the
-	 * player joins; this instance is used to equip vanilla items
-	 */
-	private Player player;
+public class CustomInventoryHandler extends InventoryHandler {
 
 	/*
 	 * items are stored inside a map with their corresponding slot because it is
@@ -31,8 +26,8 @@ public class InventoryData {
 	 */
 	public final Map<Integer, ItemStack> items = new HashMap<>();
 
-	public InventoryData(Player player) {
-		setPlayer(player);
+	public CustomInventoryHandler(Player player) {
+		super(player);
 
 		FileConfiguration config = new ConfigFile("/userdata", player.getUniqueId().toString()).getConfig();
 
@@ -80,10 +75,7 @@ public class InventoryData {
 		return items.containsKey(slot) ? items.get(slot) : null;
 	}
 
-	public Player getPlayer() {
-		return player;
-	}
-
+	@Override
 	public Collection<ItemStack> getExtraItems() {
 		return items.values();
 	}
@@ -97,11 +89,8 @@ public class InventoryData {
 		return items.keySet().stream().map(id -> MMOInventory.plugin.getSlotManager().get(id)).collect(Collectors.toSet());
 	}
 
-	public void setPlayer(Player player) {
-		this.player = player;
-	}
-
-	public void save() {
+	@Override
+	public void whenSaved() {
 		ConfigFile config = new ConfigFile(MMOInventory.plugin, "/userdata", player.getUniqueId().toString());
 
 		// Important: CLEAR current data

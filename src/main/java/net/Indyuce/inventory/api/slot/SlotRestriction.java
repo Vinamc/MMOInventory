@@ -2,8 +2,8 @@ package net.Indyuce.inventory.api.slot;
 
 import org.bukkit.inventory.ItemStack;
 
-import net.Indyuce.inventory.api.InventoryData;
 import net.Indyuce.inventory.api.LineConfig;
+import net.Indyuce.inventory.api.inventory.InventoryHandler;
 
 public abstract class SlotRestriction {
 	private final LineConfig config;
@@ -32,5 +32,5 @@ public abstract class SlotRestriction {
 	 *            The item being equipped
 	 * @return If the item can be equipped in that custom slot
 	 */
-	public abstract boolean isVerified(InventoryData data, CustomSlot slot, ItemStack item);
+	public abstract boolean isVerified(InventoryHandler provider, CustomSlot slot, ItemStack item);
 }
