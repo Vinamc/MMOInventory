@@ -122,7 +122,7 @@ public class PlayerInventoryView implements InventoryHolder {
 		 * Chestplate Slot). The inventory slot must be deleted
 		 */
 		NBTItem picked = MMOInventory.plugin.getVersionWrapper().getNBTItem(event.getCurrentItem());
-		if (picked.hasTag("inventoryItem") && (isAir(event.getCursor()) || picked.getString("inventoryItem").equals("FILL"))) {
+		if (picked.hasTag("MMOInventoryGuiItem") && (isAir(event.getCursor()) || picked.getString("MMOInventoryGuiItem").equals("FILL"))) {
 			event.setCancelled(true);
 			return;
 		}
@@ -147,7 +147,7 @@ public class PlayerInventoryView implements InventoryHolder {
 			 * instantly after checking the equip event was not canceled (bug
 			 * fix)
 			 */
-			if (picked.hasTag("inventoryItem"))
+			if (picked.hasTag("MMOInventoryGuiItem"))
 				event.setCurrentItem(null);
 
 			/*

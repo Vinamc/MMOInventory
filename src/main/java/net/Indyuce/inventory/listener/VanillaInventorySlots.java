@@ -86,7 +86,7 @@ public class VanillaInventorySlots implements Listener {
 		 * Chestplate Slot). The inventory slot must be deleted
 		 */
 		NBTItem picked = MMOInventory.plugin.getVersionWrapper().getNBTItem(event.getCurrentItem());
-		if (picked.hasTag("inventoryItem") && isAir(event.getCursor())) {
+		if (picked.hasTag("MMOInventoryGuiItem") && isAir(event.getCursor())) {
 			event.setCancelled(true);
 			return;
 		}
@@ -102,7 +102,7 @@ public class VanillaInventorySlots implements Listener {
 			return;
 		}
 
-		if (picked.hasTag("inventoryItem"))
+		if (picked.hasTag("MMOInventoryGuiItem"))
 			event.setCurrentItem(null);
 
 		data.setItem(slot, event.getCursor());

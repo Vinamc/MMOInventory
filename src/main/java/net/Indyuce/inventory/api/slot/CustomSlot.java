@@ -84,7 +84,7 @@ public class CustomSlot {
 			for (String key : config.getStringList("restrictions"))
 				restrictions.add(MMOInventory.plugin.getSlotManager().readRestriction(new LineConfig(key)));
 
-		NBTItem nbt = MMOInventory.plugin.getVersionWrapper().getNBTItem(item).addTag(new ItemTag("inventoryItem", getId()),
+		NBTItem nbt = MMOInventory.plugin.getVersionWrapper().getNBTItem(item).addTag(new ItemTag("MMOInventoryGuiItem", getId()),
 				new ItemTag("Unbreakable", true));
 		this.item = nbt.toItem();
 	}
