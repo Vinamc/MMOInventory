@@ -14,6 +14,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.MMOInventory;
@@ -50,7 +51,7 @@ public class NoCustomInventory implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void whenClicked(InventoryClickEvent event) {
-		if (!event.getClickedInventory().equals(event.getWhoClicked().getInventory()))
+		if (event.getClickedInventory() == null || !event.getClickedInventory().equals(event.getWhoClicked().getInventory()))
 			return;
 
 		/*
@@ -125,6 +126,11 @@ public class NoCustomInventory implements Listener {
 			if (NBTItem.get(next).hasTag("MMOInventoryGuiItem"))
 				iterator.remove();
 		}
+	}
+
+	@EventHandler
+	public void giveItemsOnRespawn(PlayerRespawnEvent event) {
+		giveItemsOnJoin(new PlayerJoinEvent(event.getPlayer(), "You found a secret dev easter egg"));
 	}
 
 	// checks for both null and AIR material
