@@ -12,12 +12,20 @@ import net.Indyuce.inventory.manager.DataManager;
 public class PlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void a(PlayerJoinEvent event) {
+	public void loadInventoryData(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		DataManager dataManager = MMOInventory.plugin.getDataManager();
-		
+
+		/*
+		 * Loads inventory data
+		 */
 		if (!dataManager.isInventoryLoaded(player))
 			dataManager.loadInventory(player);
+
+		/*
+		 * Refreshes the player instance if inventory data has already been
+		 * loaded
+		 */
 		else
 			dataManager.getInventory(player).setPlayer(player);
 	}

@@ -9,16 +9,16 @@ import net.Indyuce.inventory.gui.PlayerInventoryView;
 
 public class GuiListener implements Listener {
 
-	@EventHandler(priority = EventPriority.HIGH)
-	public void a(InventoryClickEvent event) {
-		if (!event.isCancelled())
-			if (event.getInventory().getHolder() instanceof PlayerInventoryView)
-				((PlayerInventoryView) event.getInventory().getHolder()).whenClicked(event);
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	public void registerClicks(InventoryClickEvent event) {
+		if (event.getInventory().getHolder() instanceof PlayerInventoryView)
+			((PlayerInventoryView) event.getInventory().getHolder()).whenClicked(event);
 	}
 
-//	@EventHandler
-//	public void b(InventoryCloseEvent event) {
-//		if (event.getInventory().getHolder() instanceof PlayerInventoryView)
-//			((PlayerInventoryView) event.getInventory().getHolder()).whenClosed(event);
-//	}
+	// @EventHandler
+	// public void b(InventoryCloseEvent event) {
+	// if (event.getInventory().getHolder() instanceof PlayerInventoryView)
+	// ((PlayerInventoryView)
+	// event.getInventory().getHolder()).whenClosed(event);
+	// }
 }

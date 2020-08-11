@@ -12,7 +12,7 @@ import net.Indyuce.inventory.api.slot.CustomSlot;
 public class DeathDrops implements Listener {
 
 	@EventHandler
-	public void a(PlayerDeathEvent event) {
+	public void dropItemsOnDeath(PlayerDeathEvent event) {
 		if (!event.getKeepInventory()) {
 			InventoryData data = MMOInventory.plugin.getDataManager().getInventory(event.getEntity());
 			for (CustomSlot slot : data.getFilledSlots()) {

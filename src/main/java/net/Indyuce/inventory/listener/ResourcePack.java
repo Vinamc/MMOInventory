@@ -28,7 +28,7 @@ public class ResourcePack implements Listener {
 	}
 
 	@EventHandler
-	public void a(PlayerJoinEvent event) {
+	public void sendResourcePack(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		Bukkit.getScheduler().scheduleSyncDelayedTask(MMOInventory.plugin, () -> player.setResourcePack(url), delay);
 	}
@@ -42,7 +42,7 @@ public class ResourcePack implements Listener {
 		}
 
 		@EventHandler
-		public void a(PlayerResourcePackStatusEvent event) {
+		public void kickPlayer(PlayerResourcePackStatusEvent event) {
 			if (event.getStatus() == Status.DECLINED || event.getStatus() == Status.FAILED_DOWNLOAD)
 				event.getPlayer().kickPlayer(message);
 		}
