@@ -20,12 +20,15 @@ import net.Indyuce.inventory.api.slot.SlotType;
 public class CustomInventoryHandler extends InventoryHandler {
 
 	/*
-	 * items are stored inside a map with their corresponding slot because it is
-	 * much easier to access every item at the same time. it also makes items
+	 * Items are stored inside a map with their corresponding slot because it is
+	 * much easier to access every item at the same time. It also makes items
 	 * accessible and EDITABLE by any other plugins.
 	 */
 	public final Map<Integer, ItemStack> items = new HashMap<>();
 
+	/**
+	 * Used when MMOInventory utilizes the custom inventory GUI
+	 */
 	public CustomInventoryHandler(Player player) {
 		super(player);
 

@@ -13,6 +13,11 @@ import net.Indyuce.inventory.api.slot.CustomSlot;
 import net.Indyuce.inventory.api.slot.SlotType;
 
 public class SimpleInventoryHandler extends InventoryHandler {
+
+	/**
+	 * Used when MMOInventory does not use the custom inventory and when the
+	 * items must be placed in the vanilla player's inventory
+	 */
 	public SimpleInventoryHandler(Player player) {
 		super(player);
 	}
