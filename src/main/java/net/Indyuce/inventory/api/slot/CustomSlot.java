@@ -14,6 +14,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.api.LineConfig;
 import net.Indyuce.inventory.api.NBTItem;
+import net.Indyuce.inventory.api.inventory.InventoryHandler;
 import net.Indyuce.inventory.version.ItemTag;
 
 public class CustomSlot {
@@ -116,7 +117,16 @@ public class CustomSlot {
 		return item;
 	}
 
-	public List<SlotRestriction> getRestrictions() {
-		return restrictions;
+	/**
+	 * @param item
+	 *            The item being equipped in the slot
+	 * @return If the item can be equipped in that slot. This only checks for
+	 *         custom restrictions and not for vanilla slot based restrictions
+	 */
+	public boolean checkSlotRestrictions(InventoryHandler player, ItemStack item) {
+		for (SlotRestriction restriction : restrictions)
+			if (!restriction.isVerified(player, this, item))
+				return false;
+		return true;
 	}
 }

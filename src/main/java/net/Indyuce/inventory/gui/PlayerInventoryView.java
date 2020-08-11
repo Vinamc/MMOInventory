@@ -17,7 +17,6 @@ import net.Indyuce.inventory.api.NBTItem;
 import net.Indyuce.inventory.api.event.ItemEquipEvent;
 import net.Indyuce.inventory.api.inventory.CustomInventoryHandler;
 import net.Indyuce.inventory.api.slot.CustomSlot;
-import net.Indyuce.inventory.api.slot.SlotRestriction;
 import net.Indyuce.inventory.api.slot.SlotType;
 
 public class PlayerInventoryView implements InventoryHolder {
@@ -109,11 +108,10 @@ public class PlayerInventoryView implements InventoryHolder {
 			}
 
 			// check for custom slot restrictions
-			for (SlotRestriction restriction : slot.getRestrictions())
-				if (!restriction.isVerified(data, slot, event.getCursor())) {
-					event.setCancelled(true);
-					return;
-				}
+			if (!slot.checkSlotRestrictions(data, event.getCursor())) {
+				event.setCancelled(true);
+				return;
+			}
 		}
 
 		/*

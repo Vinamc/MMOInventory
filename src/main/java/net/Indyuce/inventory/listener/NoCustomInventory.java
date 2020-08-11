@@ -19,7 +19,6 @@ import net.Indyuce.inventory.api.NBTItem;
 import net.Indyuce.inventory.api.event.ItemEquipEvent;
 import net.Indyuce.inventory.api.inventory.InventoryHandler;
 import net.Indyuce.inventory.api.slot.CustomSlot;
-import net.Indyuce.inventory.api.slot.SlotRestriction;
 import net.Indyuce.inventory.api.slot.SlotType;
 
 public class NoCustomInventory implements Listener {
@@ -32,10 +31,16 @@ public class NoCustomInventory implements Listener {
 		Player player = event.getPlayer();
 		for (CustomSlot slot : MMOInventory.plugin.getSlotManager().getCustomSlots()) {
 			ItemStack current = player.getInventory().getItem(slot.getIndex());
+			if (slot.checkSlotRestrictions(MMOInventory.plugin.getDataManager().getInventory(player), current))
+				continue;
+
 			player.getInventory().setItem(slot.getIndex(), slot.getItem());
 
-			// drop the previous item if it was removed from the player's inv
-			if (current != null && !NBTItem.get(current).hasTag("MMOInventoryGuiItem"))
+			/**
+			 * Drops the item that was previously in that slot only if it was
+			 * not a special MMOInv gui item
+			 */
+			if (current != null && current.getType() != Material.AIR && !NBTItem.get(current).hasTag("MMOInventoryGuiItem"))
 				for (ItemStack drop : player.getInventory().addItem(current).values())
 					player.getWorld().dropItem(player.getLocation(), drop);
 		}
@@ -72,11 +77,10 @@ public class NoCustomInventory implements Listener {
 			}
 
 			// check for custom slot restrictions
-			for (SlotRestriction restriction : slot.getRestrictions())
-				if (!restriction.isVerified(data, slot, event.getCursor())) {
-					event.setCancelled(true);
-					return;
-				}
+			if (!slot.checkSlotRestrictions(data, event.getCursor())) {
+				event.setCancelled(true);
+				return;
+			}
 		}
 
 		/*

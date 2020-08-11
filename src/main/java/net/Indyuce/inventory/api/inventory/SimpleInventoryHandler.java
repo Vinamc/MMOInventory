@@ -10,7 +10,6 @@ import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.api.slot.CustomSlot;
-import net.Indyuce.inventory.api.slot.SlotRestriction;
 import net.Indyuce.inventory.api.slot.SlotType;
 
 public class SimpleInventoryHandler extends InventoryHandler {
@@ -25,7 +24,7 @@ public class SimpleInventoryHandler extends InventoryHandler {
 		for (CustomSlot slot : MMOInventory.plugin.getSlotManager().getLoaded())
 			if (slot.getType() == SlotType.ACCESSORY) {
 				ItemStack item = player.getInventory().getItem(slot.getIndex());
-				if (!isAir(item) && canBeEquipped(slot, item))
+				if (!isAir(item) && slot.checkSlotRestrictions(this, item))
 					set.add(item);
 			}
 
@@ -36,13 +35,6 @@ public class SimpleInventoryHandler extends InventoryHandler {
 	public void whenSaved() {
 		// TODO Auto-generated method stub
 
-	}
-
-	private boolean canBeEquipped(CustomSlot slot, ItemStack item) {
-		for (SlotRestriction restriction : slot.getRestrictions())
-			if (!restriction.isVerified(this, slot, item))
-				return false;
-		return true;
 	}
 
 	private boolean isAir(ItemStack item) {
