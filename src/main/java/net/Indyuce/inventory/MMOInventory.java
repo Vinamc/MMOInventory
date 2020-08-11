@@ -8,9 +8,7 @@ import java.util.logging.Level;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.Indyuce.inventory.api.ConfigFile;
@@ -23,6 +21,8 @@ import net.Indyuce.inventory.listener.DeathDrops;
 import net.Indyuce.inventory.listener.GuiListener;
 import net.Indyuce.inventory.listener.PlayerListener;
 import net.Indyuce.inventory.listener.ResourcePack;
+import net.Indyuce.inventory.listener.SaveOnLeave;
+import net.Indyuce.inventory.listener.VanillaInventorySlots;
 import net.Indyuce.inventory.manager.DataManager;
 import net.Indyuce.inventory.manager.SlotManager;
 import net.Indyuce.inventory.version.ServerVersion;
@@ -42,11 +42,8 @@ public class MMOInventory extends JavaPlugin implements Listener {
 	 */
 	public int inventorySlots;
 
-	public MMOInventory() {
-		plugin = this;
-	}
-
 	public void onLoad() {
+		plugin = this;
 
 		if (Bukkit.getPluginManager().getPlugin("MMOItems") != null) {
 			slotManager.registerRestriction(config -> new MMOItemsTypeRestriction(config), "mmoitemstype", "mmoitemtype", "mitype");
@@ -59,7 +56,8 @@ public class MMOInventory extends JavaPlugin implements Listener {
 		ServerVersion version = new ServerVersion(Bukkit.getServer().getClass());
 		try {
 			getLogger().log(Level.INFO, "Detected Bukkit Version: " + version.toString());
-			versionWrapper = (VersionWrapper) Class.forName("net.Indyuce.inventory.version.wrapper.VersionWrapper_" + version.toString().substring(1)).newInstance();
+			versionWrapper = (VersionWrapper) Class.forName("net.Indyuce.inventory.version.wrapper.VersionWrapper_" + version.toString().substring(1))
+					.newInstance();
 		} catch (Exception e) {
 			getLogger().log(Level.INFO, "Your server version is not compatible.");
 			Bukkit.getPluginManager().disablePlugin(this);
@@ -82,14 +80,11 @@ public class MMOInventory extends JavaPlugin implements Listener {
 			Bukkit.getServer().getPluginManager().registerEvents(new ResourcePack(getConfig().getConfigurationSection("resource-pack")), this);
 
 		if (getConfig().getBoolean("save-on-leave"))
-			Bukkit.getPluginManager().registerEvents(new Listener() {
-				@EventHandler
-				public void a(PlayerQuitEvent event) {
-					dataManager.getInventory(event.getPlayer()).save();
-					dataManager.unload(event.getPlayer());
-				}
-			}, this);
+			Bukkit.getPluginManager().registerEvents(new SaveOnLeave(), this);
 
+		if (getConfig().getBoolean("no-custom-inventory"))
+			Bukkit.getPluginManager().registerEvents(new VanillaInventorySlots(), this);
+		
 		getCommand("mmoinventory").setExecutor(new MMOInventoryCommand());
 		getCommand("mmoinventory").setTabCompleter(new MMOInventoryCompletion());
 

@@ -10,6 +10,9 @@ inventory-slots: 36
 # Enable this option to move the accessory slots to the player
 # inventory. A tutorial is available on the resource page.
 # Requires a server reload when changed.
+#
+# /mmoinv will still be available but will be glitched so you MUST
+# NOT LET your players use this command if this option is enabled.
 no-custom-inventory: false
 
 # Items will drop (when keep-inventory is disabled) on death.

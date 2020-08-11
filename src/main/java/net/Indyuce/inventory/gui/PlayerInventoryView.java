@@ -121,16 +121,10 @@ public class PlayerInventoryView implements InventoryHolder {
 		 * equipped) with the current item ie the inventory slot item (eg
 		 * Chestplate Slot). The inventory slot must be deleted
 		 */
-		if (!isAir(event.getCurrentItem())) {
-			NBTItem picked = MMOInventory.plugin.getVersionWrapper().getNBTItem(event.getCurrentItem());
-			if (picked.hasTag("inventoryItem")) {
-				if (isAir(event.getCursor()) || picked.getString("inventoryItem").equals("FILL")) {
-					event.setCancelled(true);
-					return;
-				}
-
-				event.setCurrentItem(null);
-			}
+		NBTItem picked = MMOInventory.plugin.getVersionWrapper().getNBTItem(event.getCurrentItem());
+		if (picked.hasTag("inventoryItem") && (isAir(event.getCursor()) || picked.getString("inventoryItem").equals("FILL"))) {
+			event.setCancelled(true);
+			return;
 		}
 
 		if (slot != null) {
@@ -147,6 +141,19 @@ public class PlayerInventoryView implements InventoryHolder {
 			}
 
 			data.setItem(slot, event.getCursor());
+
+			/*
+			 * If the player has picked up an inventory slot item, remove it
+			 * instantly after checking the equip event was not canceled (bug
+			 * fix)
+			 */
+			if (picked.hasTag("inventoryItem"))
+				event.setCurrentItem(null);
+
+			/*
+			 * If the player is taking away an item without swapping it, place
+			 * the inventory slot item back in the corresponding slot
+			 */
 			if (isAir(event.getCursor()))
 				Bukkit.getScheduler().runTaskLater(MMOInventory.plugin, () -> event.getInventory().setItem(slot.getIndex(), slot.getItem()), 0);
 		}
