@@ -28,11 +28,18 @@ public class VanillaInventorySlots implements Listener {
 			InventoryAction.PLACE_ALL);
 
 	@EventHandler
-	public void setItemsOnJoin(PlayerJoinEvent event) {
+	public void giveItemsOnJoin(PlayerJoinEvent event) {
 
 		Player player = event.getPlayer();
-		for (CustomSlot slot : MMOInventory.plugin.getSlotManager().getCustomSlots())
+		for (CustomSlot slot : MMOInventory.plugin.getSlotManager().getCustomSlots()) {
+			ItemStack current = player.getInventory().getItem(slot.getIndex());
 			player.getInventory().setItem(slot.getIndex(), slot.getItem());
+
+			// drop the previous item if it was removed from the player's inv
+			if (current != null)
+				for (ItemStack drop : player.getInventory().addItem(current).values())
+					player.getWorld().dropItem(player.getLocation(), drop);
+		}
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
