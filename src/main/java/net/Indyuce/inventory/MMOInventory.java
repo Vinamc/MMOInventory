@@ -22,7 +22,6 @@ import net.Indyuce.inventory.listener.GuiListener;
 import net.Indyuce.inventory.listener.PlayerListener;
 import net.Indyuce.inventory.listener.ResourcePack;
 import net.Indyuce.inventory.listener.SaveOnLeave;
-import net.Indyuce.inventory.listener.VanillaInventorySlots;
 import net.Indyuce.inventory.manager.DataManager;
 import net.Indyuce.inventory.manager.SlotManager;
 import net.Indyuce.inventory.version.ServerVersion;
@@ -82,9 +81,10 @@ public class MMOInventory extends JavaPlugin implements Listener {
 		if (getConfig().getBoolean("save-on-leave"))
 			Bukkit.getPluginManager().registerEvents(new SaveOnLeave(), this);
 
-		if (getConfig().getBoolean("no-custom-inventory"))
-			Bukkit.getPluginManager().registerEvents(new VanillaInventorySlots(), this);
-		
+		// if (getConfig().getBoolean("no-custom-inventory"))
+		// Bukkit.getPluginManager().registerEvents(new VanillaInventorySlots(),
+		// this);
+
 		getCommand("mmoinventory").setExecutor(new MMOInventoryCommand());
 		getCommand("mmoinventory").setTabCompleter(new MMOInventoryCompletion());
 

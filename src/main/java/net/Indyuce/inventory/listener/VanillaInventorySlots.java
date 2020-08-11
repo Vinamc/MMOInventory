@@ -11,7 +11,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -36,7 +35,7 @@ public class VanillaInventorySlots implements Listener {
 			player.getInventory().setItem(slot.getIndex(), slot.getItem());
 
 			// drop the previous item if it was removed from the player's inv
-			if (current != null)
+			if (current != null && !NBTItem.get(current).hasTag("MMOInventoryGuiItem"))
 				for (ItemStack drop : player.getInventory().addItem(current).values())
 					player.getWorld().dropItem(player.getLocation(), drop);
 		}
@@ -44,7 +43,7 @@ public class VanillaInventorySlots implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void whenClicked(InventoryClickEvent event) {
-		if (event.getInventory().getType() != InventoryType.CRAFTING)
+		if (!event.getClickedInventory().equals(event.getWhoClicked().getInventory()))
 			return;
 
 		/*
