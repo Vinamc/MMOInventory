@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.api.slot.CustomSlot;
+import net.Indyuce.inventory.api.slot.SlotType;
 
 public class InventoryData {
 
@@ -41,30 +42,31 @@ public class InventoryData {
 					int index = Integer.parseInt(key);
 					items.put(index, config.getItemStack("inventory." + index));
 				} catch (IllegalArgumentException exception) {
-					MMOInventory.plugin.getLogger().log(Level.SEVERE, "Could not read inventory item indexed " + key + " of " + player.getName() + ": " + exception.getMessage());
+					MMOInventory.plugin.getLogger().log(Level.SEVERE,
+							"Could not read inventory item indexed " + key + " of " + player.getName() + ": " + exception.getMessage());
 				}
 	}
 
 	public void setItem(CustomSlot slot, ItemStack item) {
-		if (slot.getType().isCustom()) {
+		if (slot.getType() == SlotType.ACCESSORY) {
 
 			/*
-			 * map containing no NULL values makes it much easier for external
-			 * plugins to manipulate the mapped itemstacks
+			 * Map containing no NULL values makes it much easier for external
+			 * plugins to manipulate the mapped itemStacks
 			 */
 			if (isAir(item))
 				items.remove(slot.getIndex());
 
 			/*
-			 * equip item i.e add a clone to the map, clone so extra
-			 * modifications do not impact the stored instance in the custom
-			 * inventory
+			 * Equip item i.e add a clone to the map. The item is cloned so that
+			 * further modifications do not impact the instance stored in the
+			 * custom inventory
 			 */
 			else
 				items.put(slot.getIndex(), item.clone());
 
 			/*
-			 * equip vanilla items
+			 * Equip vanilla items
 			 */
 		} else
 			slot.getType().getVanillaSlotHandler().equip(player, item);
@@ -76,6 +78,10 @@ public class InventoryData {
 
 	public ItemStack getItem(int slot) {
 		return items.containsKey(slot) ? items.get(slot) : null;
+	}
+
+	public Player getPlayer() {
+		return player;
 	}
 
 	public Collection<ItemStack> getExtraItems() {
@@ -98,9 +104,7 @@ public class InventoryData {
 	public void save() {
 		ConfigFile config = new ConfigFile(MMOInventory.plugin, "/userdata", player.getUniqueId().toString());
 
-		/*
-		 * important: CLEAR current data
-		 */
+		// Important: CLEAR current data
 		config.getConfig().set("inventory", null);
 
 		try {
@@ -109,8 +113,8 @@ public class InventoryData {
 				config.getConfig().set("inventory." + index, isAir(item) ? null : item);
 			}
 			config.save();
-		} catch (Exception e) {
-			MMOInventory.plugin.getLogger().log(Level.SEVERE, "Could not save the inventory of " + player.getName());
+		} catch (Exception exception) {
+			MMOInventory.plugin.getLogger().log(Level.SEVERE, "Could not save inventory of " + player.getName() + ": " + exception.getMessage());
 		}
 	}
 

@@ -1,5 +1,7 @@
 package net.Indyuce.inventory.api.event;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
@@ -16,10 +18,19 @@ public class ItemEquipEvent extends PlayerEvent implements Cancellable {
 
 	private boolean cancelled = false;
 
-	/*
-	 * is NOT called when equipping items in vanilla slots.
+	/**
+	 * Event called whenever a player equips an item in a custom or vanilla slot
+	 * when he has the custom inventory opened
+	 * 
+	 * @param player
+	 *            Playing equiping the item
+	 * @param item
+	 *            Item being equipped in a custom slot, or null if the player is
+	 *            unequipping it
+	 * @param slot
+	 *            The slot the item is equipped in
 	 */
-	public ItemEquipEvent(Player player, ItemStack item, CustomSlot slot) {
+	public ItemEquipEvent(Player player, @Nullable ItemStack item, CustomSlot slot) {
 		super(player);
 
 		this.item = item;
@@ -30,7 +41,7 @@ public class ItemEquipEvent extends PlayerEvent implements Cancellable {
 		return slot;
 	}
 
-	public ItemStack getItem() {
+	public @Nullable ItemStack getItem() {
 		return item;
 	}
 

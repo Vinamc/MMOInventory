@@ -1,6 +1,5 @@
 package net.Indyuce.inventory.api.slot;
 
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.api.InventoryData;
@@ -9,6 +8,11 @@ import net.Indyuce.inventory.api.LineConfig;
 public abstract class SlotRestriction {
 	private final LineConfig config;
 
+	/**
+	 * Used to register item application restrictions with stats.
+	 * 
+	 * @param config
+	 */
 	public SlotRestriction(LineConfig config) {
 		this.config = config;
 	}
@@ -17,8 +21,16 @@ public abstract class SlotRestriction {
 		return config;
 	}
 
-	/*
-	 * called when the player tries to equip an item in a specific slot
+	/**
+	 * Called when the player tries to equip an item in a specific slot.
+	 * 
+	 * @param data
+	 *            Information about the player trying to equip an item
+	 * @param slot
+	 *            The slot the item is being equipped in
+	 * @param item
+	 *            The item being equipped
+	 * @return If the item can be equipped in that custom slot
 	 */
-	public abstract boolean isVerified(Player player, InventoryData data, CustomSlot slot, ItemStack item);
+	public abstract boolean isVerified(InventoryData data, CustomSlot slot, ItemStack item);
 }

@@ -1,6 +1,5 @@
 package net.Indyuce.inventory.comp;
 
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.api.InventoryData;
@@ -13,8 +12,9 @@ import net.mmogroup.mmolib.api.item.NBTItem;
 public class MMOItemsTypeRestriction extends SlotRestriction {
 
 	/*
-	 * forced to save the mmoitems type as a string and not a type instance
-	 * because the TypeManager has not been initialized yet
+	 * Forced to save the mmoitems type as a string and not a type instance
+	 * because the TypeManager has not been initialized yet which is fine
+	 * because we don't need to get the Type instance for our checks
 	 */
 	private final String id;
 
@@ -26,15 +26,12 @@ public class MMOItemsTypeRestriction extends SlotRestriction {
 	}
 
 	@Override
-	public boolean isVerified(Player player, InventoryData data, CustomSlot slot, ItemStack item) {
-		if (!slot.getType().isCustom())
-			return item != null && slot.getType().getVanillaSlotHandler().canEquip(item);
-
+	public boolean isVerified(InventoryData data, CustomSlot slot, ItemStack item) {
 		Type type = NBTItem.get(item).getType();
 		return type != null && id.equals(type.getId());
 	}
 
-	public String getType() {
+	public String getTypeId() {
 		return id;
 	}
 }

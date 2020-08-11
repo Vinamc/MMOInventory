@@ -1,6 +1,5 @@
 package net.Indyuce.inventory.comp;
 
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.api.InventoryData;
@@ -11,7 +10,7 @@ import net.Indyuce.mmoitems.api.player.PlayerData;
 import net.mmogroup.mmolib.api.item.NBTItem;
 
 public class MMOItemsLevelRestriction extends SlotRestriction {
-	
+
 	/*
 	 * checks if the player has the required level/class/etc. to use the item.
 	 */
@@ -20,7 +19,7 @@ public class MMOItemsLevelRestriction extends SlotRestriction {
 	}
 
 	@Override
-	public boolean isVerified(Player player, InventoryData data, CustomSlot slot, ItemStack item) {
-		return PlayerData.get(player).getRPG().canUse(NBTItem.get(item), false);
+	public boolean isVerified(InventoryData data, CustomSlot slot, ItemStack item) {
+		return PlayerData.get(data.getPlayer()).getRPG().canUse(NBTItem.get(item), false);
 	}
 }

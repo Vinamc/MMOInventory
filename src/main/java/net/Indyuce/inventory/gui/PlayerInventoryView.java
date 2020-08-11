@@ -18,12 +18,14 @@ import net.Indyuce.inventory.api.NBTItem;
 import net.Indyuce.inventory.api.event.ItemEquipEvent;
 import net.Indyuce.inventory.api.slot.CustomSlot;
 import net.Indyuce.inventory.api.slot.SlotRestriction;
+import net.Indyuce.inventory.api.slot.SlotType;
 
 public class PlayerInventoryView implements InventoryHolder {
 	private final InventoryData data;
 	private final Player player, target;
 
-	private static final List<InventoryAction> supported = Arrays.asList(InventoryAction.PICKUP_ALL, InventoryAction.SWAP_WITH_CURSOR, InventoryAction.PLACE_ALL);
+	private static final List<InventoryAction> supported = Arrays.asList(InventoryAction.PICKUP_ALL, InventoryAction.SWAP_WITH_CURSOR,
+			InventoryAction.PLACE_ALL);
 
 	public PlayerInventoryView(Player player) {
 		this(player, player);
@@ -38,19 +40,22 @@ public class PlayerInventoryView implements InventoryHolder {
 
 	@Override
 	public Inventory getInventory() {
-		Inventory inv = Bukkit.createInventory(this, MMOInventory.plugin.inventorySlots, target.equals(player) ? MMOInventory.plugin.getTranslation("inventory-name.self") : MMOInventory.plugin.getTranslation("inventory-name.other").replace("{name}", player.getName()));
+		Inventory inv = Bukkit.createInventory(this, MMOInventory.plugin.inventorySlots,
+				target.equals(player) ? MMOInventory.plugin.getTranslation("inventory-name.self")
+						: MMOInventory.plugin.getTranslation("inventory-name.other").replace("{name}", player.getName()));
 
 		/*
-		 * load custom items or vanilla items depending on slot type.
+		 * Load custom items or vanilla items depending on slot type
 		 */
 		for (CustomSlot slot : MMOInventory.plugin.getSlotManager().getLoaded())
 			if (slot.isValid()) {
-				ItemStack item = slot.getType().isCustom() ? data.getItem(slot) : slot.getType().getVanillaSlotHandler().retrieveItem(player);
+				ItemStack item = slot.getType() == SlotType.ACCESSORY ? data.getItem(slot)
+						: slot.getType().getVanillaSlotHandler().retrieveItem(player);
 				inv.setItem(slot.getIndex(), isAir(item) ? slot.getItem() : item);
 			}
 
 		/*
-		 * fill remaining inventory
+		 * Fill remaining inventory
 		 */
 		for (int j = 0; j < inv.getSize(); j++) {
 			ItemStack item = inv.getItem(j);
@@ -67,18 +72,27 @@ public class PlayerInventoryView implements InventoryHolder {
 
 	public void whenClicked(InventoryClickEvent event) {
 
-		// cannot change inventory when it's not yours
+		/*
+		 * The player cannot edit this inventory if it is not theirs
+		 */
 		if (!target.equals(player)) {
 			event.setCancelled(true);
 			return;
 		}
 
+		/*
+		 * Supported clicks TODO add support for shift click with a feature that
+		 * detects the slot he can put the item in
+		 */
 		if (!supported.contains(event.getAction())) {
 			event.setCancelled(true);
 			return;
 		}
 
-		// cannot put items in the filler slots (BUG FIX)
+		/*
+		 * Make sure the player is not trying to equip and item in a filler slot
+		 * (bug fix)
+		 */
 		if (!isAir(event.getCurrentItem()) && event.getCurrentItem().isSimilar(MMOInventory.plugin.getSlotManager().getFiller().getItem())) {
 			event.setCancelled(true);
 			return;
@@ -89,22 +103,23 @@ public class PlayerInventoryView implements InventoryHolder {
 		if (slot != null && !isAir(event.getCursor())) {
 
 			// vanilla slots requirements check
-			if (!slot.getType().isCustom() && !slot.getType().getVanillaSlotHandler().canEquip(event.getCursor())) {
+			if (slot.getType() != SlotType.ACCESSORY && !slot.getType().getVanillaSlotHandler().canEquip(event.getCursor())) {
 				event.setCancelled(true);
 				return;
 			}
 
 			// check for custom slot restrictions
 			for (SlotRestriction restriction : slot.getRestrictions())
-				if (!restriction.isVerified(player, data, slot, event.getCursor())) {
+				if (!restriction.isVerified(data, slot, event.getCursor())) {
 					event.setCancelled(true);
 					return;
 				}
 		}
 
 		/*
-		 * remove the slot item if the player tried to pick it up for any type
-		 * of custom slots.
+		 * When a player equips an item and swaps his cursor (item being
+		 * equipped) with the current item ie the inventory slot item (eg
+		 * Chestplate Slot). The inventory slot must be deleted
 		 */
 		if (!isAir(event.getCurrentItem())) {
 			NBTItem picked = MMOInventory.plugin.getVersionWrapper().getNBTItem(event.getCurrentItem());
@@ -121,8 +136,8 @@ public class PlayerInventoryView implements InventoryHolder {
 		if (slot != null) {
 
 			/*
-			 * may be called with a null item if the player is unequipping an
-			 * item
+			 * May be called with a null item as parameter if the player is
+			 * unequipping an item
 			 */
 			ItemEquipEvent equipEvent = new ItemEquipEvent(player, event.getCursor(), slot);
 			Bukkit.getPluginManager().callEvent(equipEvent);

@@ -8,8 +8,8 @@ import net.Indyuce.inventory.MMOInventory;
 
 public enum SlotType {
 
-	/*
-	 * vanilla slots
+	/**
+	 * The vanilla helmet slot
 	 */
 	HELMET(new VanillaSlotHandler() {
 
@@ -27,7 +27,12 @@ public enum SlotType {
 		public ItemStack retrieveItem(Player player) {
 			return player.getInventory().getHelmet();
 		}
-	}), CHESTPLATE(new VanillaSlotHandler() {
+	}),
+
+	/**
+	 * The vanilla chestplate slot
+	 */
+	CHESTPLATE(new VanillaSlotHandler() {
 
 		@Override
 		public void equip(Player player, ItemStack item) {
@@ -43,7 +48,12 @@ public enum SlotType {
 		public ItemStack retrieveItem(Player player) {
 			return player.getInventory().getChestplate();
 		}
-	}), LEGGINGS(new VanillaSlotHandler() {
+	}),
+
+	/**
+	 * The vanilla leggings slot
+	 */
+	LEGGINGS(new VanillaSlotHandler() {
 
 		@Override
 		public void equip(Player player, ItemStack item) {
@@ -59,7 +69,12 @@ public enum SlotType {
 		public ItemStack retrieveItem(Player player) {
 			return player.getInventory().getLeggings();
 		}
-	}), BOOTS(new VanillaSlotHandler() {
+	}),
+
+	/**
+	 * The vanilla boots slot
+	 */
+	BOOTS(new VanillaSlotHandler() {
 
 		@Override
 		public void equip(Player player, ItemStack item) {
@@ -75,7 +90,12 @@ public enum SlotType {
 		public ItemStack retrieveItem(Player player) {
 			return player.getInventory().getBoots();
 		}
-	}), OFF_HAND(new VanillaSlotHandler() {
+	}),
+
+	/**
+	 * The vanilla off hand slot
+	 */
+	OFF_HAND(new VanillaSlotHandler() {
 
 		@Override
 		public void equip(Player player, ItemStack item) {
@@ -93,10 +113,15 @@ public enum SlotType {
 		}
 	}),
 
-	/*
-	 * custom types
+	/**
+	 * Slot type which must be used when registering custom accessory/RPG slots.
 	 */
-	ACCESSORY(null), FILL(null);
+	ACCESSORY(null),
+
+	/**
+	 * Slot type used for filler items in the GUI
+	 */
+	FILL(null);
 
 	private final VanillaSlotHandler vanilla;
 
@@ -104,8 +129,13 @@ public enum SlotType {
 		this.vanilla = vanilla;
 	}
 
+	/**
+	 * @return If the custom slot is NOT a vanilla slot
+	 * @deprecated Check if it is SlotType.ACCESSORY instead
+	 */
+	@Deprecated
 	public boolean isCustom() {
-		return vanilla == null && this != FILL;
+		return this == ACCESSORY;
 	}
 
 	public VanillaSlotHandler getVanillaSlotHandler() {

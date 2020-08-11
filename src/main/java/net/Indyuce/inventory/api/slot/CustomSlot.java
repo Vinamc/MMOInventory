@@ -23,21 +23,36 @@ public class CustomSlot {
 	private final int slot;
 	private final ItemStack item;
 
-	/*
-	 * slot restrictions used by external plugins to apply type, class
-	 * restrictions, etc.
+	/**
+	 * Slot restrictions used by external plugins to apply type or class
+	 * restrictions for instance
 	 */
 	private final List<SlotRestriction> restrictions = new ArrayList<>();
 
-	/*
-	 * may be used to register custom slots using other plugins
+	/**
+	 * Used to register custom RPG inventory slots from other plugins
+	 * 
+	 * @param id
+	 *            The custom slot id (CHESTPLATE)
+	 * @param name
+	 *            The custom slot name ("Chestplate")
+	 * @param type
+	 *            The slot type, use the corresponding type for vanilla slots,
+	 *            ACCESSORY for custom RPG slots, or FILL for filler items
+	 * @param slot
+	 *            The GUI slot that will be used to display the current item in
+	 *            /rpginv
+	 * @param item
+	 *            The itemstack used to indicate the custom slot in the GUI
 	 */
 	public CustomSlot(String id, String name, SlotType type, int slot, ItemStack item) {
 		this.id = id;
 		this.name = name;
 		this.type = type;
-		this.slot = slot;
 		this.item = item;
+
+		// this makes sure any fill slot does not interfere with other slots
+		this.slot = type == SlotType.FILL ? -1 : slot;
 	}
 
 	public CustomSlot(ConfigurationSection config) {
@@ -53,7 +68,8 @@ public class CustomSlot {
 		Validate.notNull(config.getStringList("lore"), "Could not read slot lore");
 		Validate.notNull(config.getString("material"), "Could not read material");
 		int model = config.contains("durability") ? config.getInt("durability") : config.getInt("custom-model-data");
-		ItemStack item = MMOInventory.plugin.getVersionWrapper().getModelItem(Material.valueOf(config.getString("material").toUpperCase().replace("-", "_").replace(" ", "_")), model);
+		ItemStack item = MMOInventory.plugin.getVersionWrapper()
+				.getModelItem(Material.valueOf(config.getString("material").toUpperCase().replace("-", "_").replace(" ", "_")), model);
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
 		meta.addItemFlags(ItemFlag.values());
@@ -68,7 +84,8 @@ public class CustomSlot {
 			for (String key : config.getStringList("restrictions"))
 				restrictions.add(MMOInventory.plugin.getSlotManager().readRestriction(new LineConfig(key)));
 
-		NBTItem nbt = MMOInventory.plugin.getVersionWrapper().getNBTItem(item).addTag(new ItemTag("inventoryItem", getId()), new ItemTag("Unbreakable", true));
+		NBTItem nbt = MMOInventory.plugin.getVersionWrapper().getNBTItem(item).addTag(new ItemTag("inventoryItem", getId()),
+				new ItemTag("Unbreakable", true));
 		this.item = nbt.toItem();
 	}
 
@@ -84,6 +101,9 @@ public class CustomSlot {
 		return slot;
 	}
 
+	/**
+	 * @return If it is a valid custom slot ie if it is not a filler item
+	 */
 	public boolean isValid() {
 		return type != SlotType.FILL;
 	}
