@@ -10,9 +10,6 @@ inventory-slots: 36
 # Enable this option to move the accessory slots to the player
 # inventory. A tutorial is available on the resource page.
 # Requires a server reload when changed.
-#
-# /mmoinv will still be available but will be glitched so you MUST
-# NOT LET your players use this command if this option is enabled.
 no-custom-inventory: false
 
 # Items will drop (when keep-inventory is disabled) on death.
@@ -23,6 +20,21 @@ drop-on-death: true
 # MI loops through the entire player's inventory to check for ornaments.
 # Requires a server reload when changed.
 ornaments-support: false
+
+# Adds a static to the player's inventory.
+# Opens up the custom inventory when clicked.
+# Requires a server reload when changed.
+inventory-button:
+    enabled: true
+    slot: 9
+    item:
+        material: CHEST
+        name: '&6Custom Inventory'
+        lore:
+        - ''
+        - '&eClick to open.'
+        # custom-model-data: 1
+        # skull-texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjg5Yjk4ZjA0YzMyMjdkMzdkMzE5YmJjZmZjNTFmNTJlNzhkOTZhMDViMTI4NTJkMWI0NjRiYjc0MDhhNzgxMCJ9fX0=
 
 # Enable/disable auto resource pack download. Requires a server reload when changed.
 # Default RP for <1.13: https://www.dropbox.com/s/rq550yj7iebwixl/mmoinventory_rp.zip?dl=1

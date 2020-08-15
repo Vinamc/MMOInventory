@@ -5,36 +5,35 @@ import java.util.Set;
 
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.api.NBTItem;
 import net.Indyuce.inventory.version.ItemTag;
-import net.minecraft.server.v1_12_R1.ItemStack;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 
 public class VersionWrapper_1_12_R1 implements VersionWrapper {
 
 	@Override
 	public boolean isHelmet(Material material) {
-		return material.name().endsWith("HELMET") || material == Material.PUMPKIN
-				|| material.name().equals("SKULL_ITEM");
+		return material.name().endsWith("HELMET") || material == Material.PUMPKIN || material.name().equals("SKULL_ITEM");
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public org.bukkit.inventory.ItemStack getModelItem(Material material, int model) {
-		return new org.bukkit.inventory.ItemStack(material, 1, (short) model);
+	public ItemStack getModelItem(Material material, int model) {
+		return new ItemStack(material, 1, (short) model);
 	}
 
 	@Override
-	public NBTItem getNBTItem(org.bukkit.inventory.ItemStack item) {
+	public NBTItem getNBTItem(ItemStack item) {
 		return new NBTItem_v1_12_R1(item);
 	}
 
 	private class NBTItem_v1_12_R1 extends NBTItem {
-		private final ItemStack nms;
+		private final net.minecraft.server.v1_12_R1.ItemStack nms;
 		private final NBTTagCompound compound;
 
-		public NBTItem_v1_12_R1(org.bukkit.inventory.ItemStack item) {
+		public NBTItem_v1_12_R1(ItemStack item) {
 			super(item);
 
 			nms = CraftItemStack.asNMSCopy(item);
@@ -94,7 +93,7 @@ public class VersionWrapper_1_12_R1 implements VersionWrapper {
 		}
 
 		@Override
-		public org.bukkit.inventory.ItemStack toItem() {
+		public ItemStack toItem() {
 			nms.setTag(compound);
 			return CraftItemStack.asBukkitCopy(nms);
 		}

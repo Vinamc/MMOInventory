@@ -4,8 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.Indyuce</groupId>
 	<artifactId>mmoinventory</artifactId>
-	<version>1.2.2</version>
+	<version>1.2.3</version>
 	<name>MMOInventory</name>
+	<description>A simple RPG inventory plugin compatible with MMOItems</description>
 
 	<build>
 		<finalName>${project.name}-${project.version}</finalName>
@@ -48,8 +49,15 @@
 		</dependency>
 		<dependency>
 			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-api-1.16.2</artifactId>
+			<version>1.16.2</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/spigot-1.16.2.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.14.4</version>
+			<version>1.16.1</version>
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/spigot.jar</systemPath>
 		</dependency>

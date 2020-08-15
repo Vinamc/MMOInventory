@@ -6,9 +6,9 @@ import org.bukkit.inventory.ItemStack;
 import net.Indyuce.inventory.api.NBTItem;
 
 public interface VersionWrapper {
-	NBTItem getNBTItem(ItemStack item);
+	public NBTItem getNBTItem(ItemStack item);
 
-	ItemStack getModelItem(Material material, int model);
+	public ItemStack getModelItem(Material material, int model);
 
-	boolean isHelmet(Material material);
+	public boolean isHelmet(Material material);
 }

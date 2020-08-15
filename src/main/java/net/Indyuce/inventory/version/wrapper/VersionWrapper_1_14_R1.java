@@ -5,37 +5,35 @@ import java.util.Set;
 
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
+import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.api.NBTItem;
 import net.Indyuce.inventory.version.ItemTag;
-import net.minecraft.server.v1_14_R1.ItemStack;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 
 public class VersionWrapper_1_14_R1 implements VersionWrapper {
 
 	@Override
 	public boolean isHelmet(Material material) {
-		return material.name().endsWith("HELMET") || material == Material.CARVED_PUMPKIN
-				|| material == Material.PLAYER_HEAD || material == Material.CREEPER_HEAD
-				|| material == Material.SKELETON_SKULL || material == Material.WITHER_SKELETON_SKULL;
+		return material.name().endsWith("HELMET") || material == Material.CARVED_PUMPKIN || material == Material.PLAYER_HEAD
+				|| material == Material.CREEPER_HEAD || material == Material.SKELETON_SKULL || material == Material.WITHER_SKELETON_SKULL;
 	}
 
 	@Override
-	public org.bukkit.inventory.ItemStack getModelItem(Material material, int model) {
-		return new NBTItem_v1_14_R1(new org.bukkit.inventory.ItemStack(material))
-				.addTag(new ItemTag("CustomModelData", model)).toItem();
+	public ItemStack getModelItem(Material material, int model) {
+		return new NBTItem_v1_14_R1(new ItemStack(material)).addTag(new ItemTag("CustomModelData", model)).toItem();
 	}
 
 	@Override
-	public NBTItem getNBTItem(org.bukkit.inventory.ItemStack item) {
+	public NBTItem getNBTItem(ItemStack item) {
 		return new NBTItem_v1_14_R1(item);
 	}
 
 	private class NBTItem_v1_14_R1 extends NBTItem {
-		private final ItemStack nms;
+		private final net.minecraft.server.v1_14_R1.ItemStack nms;
 		private final NBTTagCompound compound;
 
-		public NBTItem_v1_14_R1(org.bukkit.inventory.ItemStack item) {
+		public NBTItem_v1_14_R1(ItemStack item) {
 			super(item);
 
 			nms = CraftItemStack.asNMSCopy(item);
@@ -95,7 +93,7 @@ public class VersionWrapper_1_14_R1 implements VersionWrapper {
 		}
 
 		@Override
-		public org.bukkit.inventory.ItemStack toItem() {
+		public ItemStack toItem() {
 			nms.setTag(compound);
 			return CraftItemStack.asBukkitCopy(nms);
 		}

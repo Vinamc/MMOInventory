@@ -20,6 +20,7 @@ import net.Indyuce.inventory.comp.MMOItemsLevelRestriction;
 import net.Indyuce.inventory.comp.MMOItemsTypeRestriction;
 import net.Indyuce.inventory.listener.DeathDrops;
 import net.Indyuce.inventory.listener.GuiListener;
+import net.Indyuce.inventory.listener.InventoryButtonListener;
 import net.Indyuce.inventory.listener.NoCustomInventory;
 import net.Indyuce.inventory.listener.PlayerListener;
 import net.Indyuce.inventory.listener.ResourcePack;
@@ -28,6 +29,7 @@ import net.Indyuce.inventory.manager.DataManager;
 import net.Indyuce.inventory.manager.SlotManager;
 import net.Indyuce.inventory.version.ServerVersion;
 import net.Indyuce.inventory.version.wrapper.VersionWrapper;
+import net.Indyuce.inventory.version.wrapper.VersionWrapper_Reflection;
 
 public class MMOInventory extends JavaPlugin implements Listener {
 	public static MMOInventory plugin;
@@ -35,6 +37,7 @@ public class MMOInventory extends JavaPlugin implements Listener {
 	private final DataManager dataManager = new DataManager();
 	private final SlotManager slotManager = new SlotManager();
 
+	private ServerVersion version;
 	private VersionWrapper versionWrapper;
 	private ConfigFile language;
 
@@ -54,15 +57,14 @@ public class MMOInventory extends JavaPlugin implements Listener {
 
 	public void onEnable() {
 
-		ServerVersion version = new ServerVersion(Bukkit.getServer().getClass());
+		version = new ServerVersion(Bukkit.getServer().getClass());
 		try {
 			getLogger().log(Level.INFO, "Detected Bukkit Version: " + version.toString());
 			versionWrapper = (VersionWrapper) Class.forName("net.Indyuce.inventory.version.wrapper.VersionWrapper_" + version.toString().substring(1))
 					.newInstance();
 		} catch (Exception e) {
-			getLogger().log(Level.INFO, "Your server version is not compatible.");
-			Bukkit.getPluginManager().disablePlugin(this);
-			return;
+			getLogger().log(Level.INFO, "Your server version is handled via reflection");
+			versionWrapper = new VersionWrapper_Reflection();
 		}
 
 		saveDefaultConfig();
@@ -77,16 +79,22 @@ public class MMOInventory extends JavaPlugin implements Listener {
 		if (getConfig().getBoolean("resource-pack.enabled"))
 			Bukkit.getServer().getPluginManager().registerEvents(new ResourcePack(getConfig().getConfigurationSection("resource-pack")), this);
 
-		if (getConfig().getBoolean("save-on-leave"))
-			Bukkit.getPluginManager().registerEvents(new SaveOnLeave(), this);
-
 		if (getConfig().getBoolean("no-custom-inventory")) {
 			dataManager.setInventoryProvider(player -> new SimpleInventoryHandler(player));
 			Bukkit.getPluginManager().registerEvents(new NoCustomInventory(), this);
-		} 
+		}
 
-		else if (getConfig().getBoolean("drop-on-death"))
-			Bukkit.getServer().getPluginManager().registerEvents(new DeathDrops(), this);
+		else {
+
+			if (getConfig().getBoolean("save-on-leave"))
+				Bukkit.getPluginManager().registerEvents(new SaveOnLeave(), this);
+
+			if (getConfig().getBoolean("inventory-button.enabled"))
+				Bukkit.getPluginManager().registerEvents(new InventoryButtonListener(getConfig().getConfigurationSection("inventory-button")), this);
+
+			if (getConfig().getBoolean("drop-on-death"))
+				Bukkit.getServer().getPluginManager().registerEvents(new DeathDrops(), this);
+		}
 
 		getCommand("mmoinventory").setExecutor(new MMOInventoryCommand());
 		getCommand("mmoinventory").setTabCompleter(new MMOInventoryCompletion());
@@ -130,6 +138,10 @@ public class MMOInventory extends JavaPlugin implements Listener {
 
 	public SlotManager getSlotManager() {
 		return slotManager;
+	}
+
+	public ServerVersion getVersion() {
+		return version;
 	}
 
 	public String getTranslation(String path) {
