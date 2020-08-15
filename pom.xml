@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.Indyuce</groupId>
 	<artifactId>mmoinventory</artifactId>
-	<version>1.2.3</version>
+	<version>1.2.4</version>
 	<name>MMOInventory</name>
 	<description>A simple RPG inventory plugin compatible with MMOItems</description>
 
