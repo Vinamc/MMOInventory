@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.logging.Level;
 
+import net.Indyuce.inventory.comp.MMOItemsUniqueRestriction;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -52,6 +53,7 @@ public class MMOInventory extends JavaPlugin implements Listener {
 		if (Bukkit.getPluginManager().getPlugin("MMOItems") != null) {
 			slotManager.registerRestriction(config -> new MMOItemsTypeRestriction(config), "mmoitemstype", "mmoitemtype", "mitype");
 			slotManager.registerRestriction(config -> new MMOItemsLevelRestriction(config), "mmoitemslevel", "mmoitemlevel", "milevel");
+			slotManager.registerRestriction(config -> new MMOItemsUniqueRestriction(config), "unique");
 		}
 	}
 

@@ -101,6 +101,12 @@ public class PlayerInventoryView implements InventoryHolder {
 		CustomSlot slot = MMOInventory.plugin.getSlotManager().get(event.getRawSlot());
 		if (slot != null && !isAir(event.getCursor())) {
 
+			// prevents equipping stacked items
+			if (MMOInventory.plugin.getConfig().getBoolean("disable-equiping-stacked-items", true) && event.getCursor().getAmount() > 1) {
+				event.setCancelled(true);
+				return;
+			}
+
 			// vanilla slots requirements check
 			if (slot.getType() != SlotType.ACCESSORY && !slot.getType().getVanillaSlotHandler().canEquip(event.getCursor())) {
 				event.setCancelled(true);

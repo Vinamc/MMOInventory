@@ -104,6 +104,7 @@ ARTIFACT_1:
     slot: 10
     restrictions:
     - 'mmoitemstype{type=ARTIFACT}'
+    - 'unique{enabled=true}'
     lore:
     - Drag & drop an item to equip it.
 ARTIFACT_2:
@@ -114,6 +115,7 @@ ARTIFACT_2:
     slot: 19
     restrictions:
     - 'mmoitemstype{type=ARTIFACT}'
+    - 'unique{enabled=true}'
     lore:
     - Drag & drop an item to equip it.
 ARTIFACT_3:
@@ -124,6 +126,7 @@ ARTIFACT_3:
     slot: 28
     restrictions:
     - 'mmoitemstype{type=ARTIFACT}'
+    - 'unique{enabled=true}'
     lore:
     - Drag & drop an item to equip it.
 

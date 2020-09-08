@@ -24,7 +24,7 @@ public abstract class SlotRestriction {
 	/**
 	 * Called when the player tries to equip an item in a specific slot.
 	 * 
-	 * @param data
+	 * @param provider
 	 *            Information about the player trying to equip an item
 	 * @param slot
 	 *            The slot the item is being equipped in

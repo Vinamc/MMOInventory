@@ -12,6 +12,10 @@ inventory-slots: 36
 # Requires a server reload when changed.
 no-custom-inventory: false
 
+# This prevents a known dupe bug so it is strongly
+# recommended to keep this set to true.
+disable-equiping-stacked-items: true
+
 # Items will drop (when keep-inventory is disabled) on death.
 # Requires a server reload when changed.
 drop-on-death: true
@@ -25,7 +29,7 @@ ornaments-support: false
 # Opens up the custom inventory when clicked.
 # Requires a server reload when changed.
 inventory-button:
-    enabled: true
+    enabled: false
     slot: 9
     item:
         material: CHEST
