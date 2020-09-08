@@ -19,7 +19,6 @@ import net.Indyuce.mmoitems.MMOItems;
 import net.Indyuce.mmoitems.api.Type.EquipmentSlot;
 import net.Indyuce.mmoitems.api.player.PlayerData;
 import net.Indyuce.mmoitems.comp.inventory.PlayerInventory;
-import net.mmogroup.mmolib.MMOLib;
 import net.mmogroup.mmolib.api.item.NBTItem;
 
 public class MMOItemsCompatibility implements PlayerInventory, Listener {
@@ -75,7 +74,7 @@ public class MMOItemsCompatibility implements PlayerInventory, Listener {
 
 			for (ItemStack item : player.getInventory().getContents()) {
 				NBTItem nbtItem;
-				if (item != null && (nbtItem = MMOLib.plugin.getNMS().getNBTItem(item)).hasType() && nbtItem.getType().getEquipmentType() == EquipmentSlot.ANY)
+				if (item != null && (nbtItem = NBTItem.get(item)).hasType() && nbtItem.getType().getEquipmentType() == EquipmentSlot.ANY)
 					list.add(new EquippedItem(nbtItem, EquipmentSlot.ANY));
 			}
 
