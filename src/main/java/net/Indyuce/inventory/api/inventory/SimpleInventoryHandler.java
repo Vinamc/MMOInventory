@@ -37,10 +37,9 @@ public class SimpleInventoryHandler extends InventoryHandler {
 	}
 
 	@Override
-	public void whenSaved() {
-		// TODO Auto-generated method stub
-
-	}
+	public void whenSaved() {}
+	@Override
+	public void whenSavedSQL() {}
 
 	private boolean isAir(ItemStack item) {
 		return item == null || item.getType() == Material.AIR;

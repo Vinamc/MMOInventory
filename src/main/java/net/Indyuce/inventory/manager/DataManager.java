@@ -10,6 +10,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.api.inventory.CustomInventoryHandler;
 import net.Indyuce.inventory.api.inventory.InventoryHandler;
 
@@ -70,5 +71,19 @@ public class DataManager {
 
 	public Collection<InventoryHandler> getLoaded() {
 		return inventories.values();
+	}
+
+	public void save() {
+		inventories.values().forEach(data -> {
+			if(MMOInventory.plugin.getSQLManager().isEnabled()) data.whenSavedSQL();
+			else data.whenSaved();
+		});
+	}
+	
+	public void save(Player player) {
+		InventoryHandler data = inventories.get(player.getUniqueId());
+		if(MMOInventory.plugin.getSQLManager().isEnabled())
+			data.whenSavedSQL();
+		else data.whenSaved();
 	}
 }

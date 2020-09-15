@@ -36,4 +36,5 @@ public abstract class InventoryHandler {
 	 * save the data in a config file if needed
 	 */
 	public abstract void whenSaved();
+	public abstract void whenSavedSQL();
 }

@@ -3,6 +3,7 @@ package net.Indyuce.inventory.api.inventory;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.api.ConfigFile;
 import net.Indyuce.inventory.api.slot.CustomSlot;
 import net.Indyuce.inventory.api.slot.SlotType;
+import net.Indyuce.inventory.sql.SQLUserdata;
 
 public class CustomInventoryHandler extends InventoryHandler {
 
@@ -32,6 +34,11 @@ public class CustomInventoryHandler extends InventoryHandler {
 	public CustomInventoryHandler(Player player) {
 		super(player);
 
+		if(MMOInventory.plugin.getSQLManager().isEnabled()) loadSQL();
+		else load();
+	}
+	
+	private void load() {
 		FileConfiguration config = new ConfigFile("/userdata", player.getUniqueId().toString()).getConfig();
 
 		if (config.contains("inventory"))
@@ -43,6 +50,12 @@ public class CustomInventoryHandler extends InventoryHandler {
 					MMOInventory.plugin.getLogger().log(Level.SEVERE,
 							"Could not read inventory item indexed " + key + " of " + player.getName() + ": " + exception.getMessage());
 				}
+	}
+	
+	private void loadSQL() {
+		SQLUserdata data = MMOInventory.plugin.getSQLManager().getUserData(player.getUniqueId().toString());
+		for(Entry<Integer, ItemStack> entry : data.get())
+			items.put(entry.getKey(), entry.getValue());
 	}
 
 	public void setItem(CustomSlot slot, ItemStack item) {
@@ -108,6 +121,11 @@ public class CustomInventoryHandler extends InventoryHandler {
 		} catch (Exception exception) {
 			MMOInventory.plugin.getLogger().log(Level.SEVERE, "Could not save inventory of " + player.getName() + ": " + exception.getMessage());
 		}
+	}
+
+	@Override
+	public void whenSavedSQL() {
+		MMOInventory.plugin.getSQLManager().save(player.getUniqueId().toString(), items.entrySet());
 	}
 
 	private boolean isAir(ItemStack item) {

@@ -28,6 +28,7 @@ import net.Indyuce.inventory.listener.ResourcePack;
 import net.Indyuce.inventory.listener.SaveOnLeave;
 import net.Indyuce.inventory.manager.DataManager;
 import net.Indyuce.inventory.manager.SlotManager;
+import net.Indyuce.inventory.sql.SQLManager;
 import net.Indyuce.inventory.version.ServerVersion;
 import net.Indyuce.inventory.version.wrapper.VersionWrapper;
 import net.Indyuce.inventory.version.wrapper.VersionWrapper_Reflection;
@@ -37,6 +38,7 @@ public class MMOInventory extends JavaPlugin implements Listener {
 
 	private final DataManager dataManager = new DataManager();
 	private final SlotManager slotManager = new SlotManager();
+	private final SQLManager sqlManager = new SQLManager();
 
 	private ServerVersion version;
 	private VersionWrapper versionWrapper;
@@ -78,6 +80,8 @@ public class MMOInventory extends JavaPlugin implements Listener {
 		Bukkit.getServer().getPluginManager().registerEvents(new GuiListener(), this);
 		Bukkit.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
+		sqlManager.load();
+		
 		if (getConfig().getBoolean("resource-pack.enabled"))
 			Bukkit.getServer().getPluginManager().registerEvents(new ResourcePack(getConfig().getConfigurationSection("resource-pack")), this);
 
@@ -111,7 +115,7 @@ public class MMOInventory extends JavaPlugin implements Listener {
 	}
 
 	public void onDisable() {
-		dataManager.getLoaded().forEach(data -> data.whenSaved());
+		dataManager.save();
 	}
 
 	public void reload() {
@@ -140,6 +144,10 @@ public class MMOInventory extends JavaPlugin implements Listener {
 
 	public SlotManager getSlotManager() {
 		return slotManager;
+	}
+	
+	public SQLManager getSQLManager() {
+		return sqlManager;
 	}
 
 	public ServerVersion getVersion() {

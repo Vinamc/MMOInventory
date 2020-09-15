@@ -3,6 +3,16 @@
 # from inventory data. Requires a server reload when changed.
 save-on-leave: true
 
+# MySQL Support
+mysql:
+    enabled: false
+    database: minecraft
+    host: localhost
+    port: 3306
+    user: mmolover
+    pass: ILoveAria
+    flags: '?allowReconnect=true&useSSL=false'
+
 # Amount of slots in the inventory - has to be a multiple of 9.
 # Remember to update the slot numbers in items.yml after changing this option.
 inventory-slots: 36
