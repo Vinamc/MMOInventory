@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.Gson;
@@ -15,18 +16,17 @@ import com.google.gson.Gson;
 import net.Indyuce.inventory.MMOInventory;
 
 public class SQLManager {
-	private final boolean enabled;
-	private final MySQLConfig config;
+	private boolean enabled;
+	private MySQLConfig config;
 	private Connection connection;
 	private final Gson gson = new Gson();
 
-	public SQLManager() {
-		ConfigurationSection section = MMOInventory.plugin.getConfig().getConfigurationSection("mysql");
+	public void load(FileConfiguration cfg) {
+		if(!cfg.contains("mysql") || !cfg.isConfigurationSection("mysql")) return;
+		ConfigurationSection section = cfg.getConfigurationSection("mysql");
 		enabled = section.getBoolean("enabled", false);
 		config = new MySQLConfig(section);
-	}
-
-	public void load() {
+		
 		if (!enabled) return;
 		initialize();
 
