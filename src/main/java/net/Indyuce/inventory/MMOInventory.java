@@ -80,7 +80,7 @@ public class MMOInventory extends JavaPlugin implements Listener {
 		Bukkit.getServer().getPluginManager().registerEvents(new GuiListener(), this);
 		Bukkit.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
-		sqlManager.load(getConfig());
+		sqlManager.setup(getConfig());
 		
 		if (getConfig().getBoolean("resource-pack.enabled"))
 			Bukkit.getServer().getPluginManager().registerEvents(new ResourcePack(getConfig().getConfigurationSection("resource-pack")), this);

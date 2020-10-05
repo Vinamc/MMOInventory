@@ -6,12 +6,15 @@ save-on-leave: true
 # MySQL Support
 mysql:
     enabled: false
-    database: minecraft
     host: localhost
     port: 3306
+    database: minecraft
     user: mmolover
     pass: ILoveAria
-    flags: '?allowReconnect=true&useSSL=false'
+    properties:
+      cachePrepStmts: true
+      prepStmtCacheSize: 250
+      prepStmtCacheSqlLimit: 2048
 
 # Amount of slots in the inventory - has to be a multiple of 9.
 # Remember to update the slot numbers in items.yml after changing this option.
