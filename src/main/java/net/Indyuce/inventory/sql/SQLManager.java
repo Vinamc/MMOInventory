@@ -58,20 +58,14 @@ public class SQLManager extends MMODataSource {
 	}
 
 	public void save(final String uuid, final Set<Entry<Integer, ItemStack>> inventory) {
-		try {
-			final int id = getID(uuid);
-			executeUpdateAsync("DELETE FROM mmoinv_data WHERE id = '" + id + "'").get();
-			StringBuilder builder = new StringBuilder();
-			for (Entry<Integer, ItemStack> entry : inventory) {
-				String stack = gson.toJson(entry.getValue());
-				builder.append("(" + id + ", " + entry.getKey() + ", '" + stack + "')");
-				builder.append(", ");
-			}
-			builder.setLength(builder.length() - 2); // gets rid of the last '", "'
-			executeUpdateAsync("INSERT INTO mmoinv_data (id,slot_index,stack) VALUES " + builder.toString() + ";")
-					.get();
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
+		final int id = getID(uuid);
+		executeUpdate("DELETE FROM mmoinv_data WHERE id = '" + id + "'");
+		StringBuilder builder = new StringBuilder();
+		for (Entry<Integer, ItemStack> entry : inventory) {
+			String stack = gson.toJson(entry.getValue());
+			builder.append("(" + id + ", " + entry.getKey() + ", '" + stack + "')").append(", ");
 		}
+		builder.setLength(builder.length() - 2); // gets rid of the last '", "'
+		executeUpdate("INSERT INTO mmoinv_data (id,slot_index,stack) VALUES " + builder.toString() + ";");
 	}
 }
