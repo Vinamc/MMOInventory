@@ -116,6 +116,7 @@ public class MMOInventory extends JavaPlugin implements Listener {
 
 	public void onDisable() {
 		dataManager.save();
+		sqlManager.close();
 	}
 
 	public void reload() {

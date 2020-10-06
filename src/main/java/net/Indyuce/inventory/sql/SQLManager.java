@@ -1,6 +1,5 @@
 package net.Indyuce.inventory.sql;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -11,6 +10,8 @@ import org.bukkit.inventory.ItemStack;
 import com.google.gson.Gson;
 
 import net.Indyuce.inventory.MMOInventory;
+import net.mmogroup.mmolib.MMOLib;
+import net.mmogroup.mmolib.api.util.SimpleWrapper;
 import net.mmogroup.mmolib.sql.MMODataSource;
 
 public class SQLManager extends MMODataSource {
@@ -25,16 +26,18 @@ public class SQLManager extends MMODataSource {
 	}
 
 	public int getID(final String uuid) {
-		try {
-			executeUpdateAsync("INSERT INTO mmoinv_players (uuid) SELECT * FROM (SELECT '" + uuid + "') AS tmp "
-					+ "WHERE NOT EXISTS (SELECT uuid FROM mmoinv_players WHERE uuid = '" + uuid + "') LIMIT 1;").get();
-			ResultSet result = getResultAsync("SELECT id FROM mmoinv_players WHERE uuid = '" + uuid + "'").get();
-			if (result.first())
-				return result.getInt("id");
-		} catch (InterruptedException | ExecutionException | SQLException e) {
-			e.printStackTrace();
-		}
-		return -1;
+		SimpleWrapper<Integer> id = new SimpleWrapper<>(-1);
+		executeUpdate("INSERT INTO mmoinv_players (uuid) SELECT * FROM (SELECT '" + uuid + "') AS tmp "
+				+ "WHERE NOT EXISTS (SELECT uuid FROM mmoinv_players WHERE uuid = '" + uuid + "') LIMIT 1;");
+		getResult("SELECT id FROM mmoinv_players WHERE uuid = '" + uuid + "'", (result) -> {
+			try {
+				if (result.first())
+					id.setValue(result.getInt("id"));
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		});
+		return id.getValue();
 	}
 
 	public SQLUserdata getUserData(final String uuid) {
@@ -45,12 +48,17 @@ public class SQLManager extends MMODataSource {
 			return data;
 		}
 		try {
-			ResultSet result = getResultAsync("SELECT slot_index,stack FROM mmoinv_data WHERE id = '" + id + "'").get();
-			if (result.first()) {
-				ItemStack stack = gson.fromJson(result.getString("stack"), ItemStack.class);
-				data.put(result.getInt("slot_index"), stack);
-			}
-		} catch (InterruptedException | ExecutionException | SQLException e) {
+			getResultAsync("SELECT slot_index,stack FROM mmoinv_data WHERE id = '" + id + "'", (result) -> {
+				try {
+					if (result.first()) {
+						ItemStack stack = MMOLib.plugin.getJson().parse(result.getString("stack"), ItemStack.class);
+						data.put(result.getInt("slot_index"), stack);
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}).get();
+		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}
 
@@ -65,7 +73,9 @@ public class SQLManager extends MMODataSource {
 			String stack = gson.toJson(entry.getValue());
 			builder.append("(" + id + ", " + entry.getKey() + ", '" + stack + "')").append(", ");
 		}
-		builder.setLength(builder.length() - 2); // gets rid of the last '", "'
-		executeUpdate("INSERT INTO mmoinv_data (id,slot_index,stack) VALUES " + builder.toString() + ";");
+		if (builder.length() > 2) {
+			builder.setLength(builder.length() - 2); // gets rid of the last '", "'
+			executeUpdate("INSERT INTO mmoinv_data (id,slot_index,stack) VALUES " + builder.toString() + ";");
+		}
 	}
 }
