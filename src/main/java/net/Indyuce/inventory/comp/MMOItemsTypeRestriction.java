@@ -27,7 +27,7 @@ public class MMOItemsTypeRestriction extends SlotRestriction {
 
 	@Override
 	public boolean isVerified(InventoryHandler provider, CustomSlot slot, ItemStack item) {
-		Type type = NBTItem.get(item).getType();
+		Type type = Type.get(NBTItem.get(item).getType());
 		return type != null && id.equals(type.getId());
 	}
 

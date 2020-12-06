@@ -3,6 +3,7 @@ package net.Indyuce.inventory.comp;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.Indyuce.mmoitems.api.Type;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -58,8 +59,7 @@ public class MMOItemsCompatibility implements PlayerInventory, Listener {
 		Bukkit.getScheduler().runTaskLater(MMOInventory.plugin, () -> PlayerData.get(event.getPlayer()).updateInventory(), 0);
 	}
 
-	public class OrnamentSupport implements PlayerInventory {
-
+	public static class OrnamentSupport implements PlayerInventory {
 		@Override
 		public List<EquippedItem> getInventory(Player player) {
 			List<EquippedItem> list = new ArrayList<>();
@@ -74,7 +74,7 @@ public class MMOItemsCompatibility implements PlayerInventory, Listener {
 
 			for (ItemStack item : player.getInventory().getContents()) {
 				NBTItem nbtItem;
-				if (item != null && (nbtItem = NBTItem.get(item)).hasType() && nbtItem.getType().getEquipmentType() == EquipmentSlot.ANY)
+				if (item != null && (nbtItem = NBTItem.get(item)).hasType() && Type.get(nbtItem.getType()).getEquipmentType() == EquipmentSlot.ANY)
 					list.add(new EquippedItem(nbtItem, EquipmentSlot.ANY));
 			}
 
