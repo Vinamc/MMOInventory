@@ -1,8 +1,9 @@
-name: ${project.name}
+name: MMOInventory
 version: ${project.version}
 main: net.Indyuce.inventory.MMOInventory
 author: Indyuce
 description: ${project.description}
+depend: [MMOLib, MMOItems]
 api-version: 1.13
 commands:
     mmoinventory:

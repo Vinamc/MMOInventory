@@ -53,9 +53,9 @@ public class MMOInventory extends JavaPlugin implements Listener {
 		plugin = this;
 
 		if (Bukkit.getPluginManager().getPlugin("MMOItems") != null) {
-			slotManager.registerRestriction(config -> new MMOItemsTypeRestriction(config), "mmoitemstype", "mmoitemtype", "mitype");
-			slotManager.registerRestriction(config -> new MMOItemsLevelRestriction(config), "mmoitemslevel", "mmoitemlevel", "milevel");
-			slotManager.registerRestriction(config -> new MMOItemsUniqueRestriction(config), "unique");
+			slotManager.registerRestriction(MMOItemsTypeRestriction::new, "mmoitemstype", "mmoitemtype", "mitype");
+			slotManager.registerRestriction(MMOItemsLevelRestriction::new, "mmoitemslevel", "mmoitemlevel", "milevel");
+			slotManager.registerRestriction(MMOItemsUniqueRestriction::new, "unique");
 		}
 	}
 
@@ -86,7 +86,7 @@ public class MMOInventory extends JavaPlugin implements Listener {
 			Bukkit.getServer().getPluginManager().registerEvents(new ResourcePack(getConfig().getConfigurationSection("resource-pack")), this);
 
 		if (getConfig().getBoolean("no-custom-inventory")) {
-			dataManager.setInventoryProvider(player -> new SimpleInventoryHandler(player));
+			dataManager.setInventoryProvider(SimpleInventoryHandler::new);
 			Bukkit.getPluginManager().registerEvents(new NoCustomInventory(), this);
 		}
 
@@ -106,7 +106,7 @@ public class MMOInventory extends JavaPlugin implements Listener {
 		getCommand("mmoinventory").setTabCompleter(new MMOInventoryCompletion());
 
 		// /reload friendly
-		Bukkit.getOnlinePlayers().forEach(player -> dataManager.setupData(player));
+		Bukkit.getOnlinePlayers().forEach(dataManager::setupData);
 
 		if (Bukkit.getPluginManager().getPlugin("MMOItems") != null) {
 			new MMOItemsCompatibility();
