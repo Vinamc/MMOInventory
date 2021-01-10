@@ -32,6 +32,16 @@ public abstract class InventoryHandler {
 	public abstract Collection<ItemStack> getExtraItems();
 
 	/**
+	 * @return A collection of all the extra items (vanilla slots put aside) ie
+	 *         accessories placed in custom RPG slots.
+	 *         <p></p>
+	 *         Skips verification to avoid an infinite loop when checking for
+	 *         the 'unique' requirement where these items check if themselves
+	 *         have passed the condition while checking if they pass it.
+	 */
+	public abstract Collection<ItemStack> getExtraItemsUnverified(Integer... excluded);
+
+	/**
 	 * Called when the plugin is disabling/player is leaving. Should be used to
 	 * save the data in a config file if needed
 	 */

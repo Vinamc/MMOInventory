@@ -12,6 +12,8 @@ import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.api.slot.CustomSlot;
 import net.Indyuce.inventory.api.slot.SlotType;
 
+import static org.bukkit.Bukkit.getServer;
+
 public class SimpleInventoryHandler extends InventoryHandler {
 
 	/**
@@ -24,14 +26,53 @@ public class SimpleInventoryHandler extends InventoryHandler {
 
 	@Override
 	public Collection<ItemStack> getExtraItems() {
+		return getItems(true);
+	}
+
+	@Override
+	public Collection<ItemStack> getExtraItemsUnverified(Integer... excluded) {
+		return getItems(false, excluded);
+	}
+
+	Collection<ItemStack> getItems(boolean verify, Integer... excluded) {
 		Set<ItemStack> set = new HashSet<>();
 
-		for (CustomSlot slot : MMOInventory.plugin.getSlotManager().getLoaded())
-			if (slot.getType() == SlotType.ACCESSORY) {
-				ItemStack item = player.getInventory().getItem(slot.getIndex());
-				if (!isAir(item) && slot.checkSlotRestrictions(this, item))
-					set.add(item);
+		// For each special slot
+		for (CustomSlot slot : MMOInventory.plugin.getSlotManager().getLoaded()) {
+
+			// Is it excluded?
+			boolean isExcluded = false;
+			for (Integer ex : excluded) {
+				if (ex == slot.getIndex()) {
+					isExcluded = true;
+					break;
+				}
 			}
+
+			// If its an accessory
+			if (!isExcluded && slot.getType() == SlotType.ACCESSORY) {
+
+				// Get that item
+				ItemStack item = player.getInventory().getItem(slot.getIndex());
+
+				// Is the item not a 'default' MMOInventory display thingy
+				if (!MMOInventory.plugin.getVersionWrapper().getNBTItem(item).hasTag("MMOInventoryGuiItem") && !isAir(item)) {
+
+					// Should it be verified?
+					boolean verified = !verify;
+					if (!verified) {
+						verified = slot.checkSlotRestrictions(this, item);
+					}
+
+					// Does it exist? Is it not a 'default' slot item? Does it meet slot restrictions?
+					if (verified) {
+
+						// Add it!
+						set.add(item);
+					}
+				}
+			}
+		}
 
 		return set;
 	}

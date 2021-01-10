@@ -19,6 +19,8 @@ import net.Indyuce.inventory.api.slot.CustomSlot;
 import net.Indyuce.inventory.api.slot.SlotType;
 import net.Indyuce.inventory.sql.SQLUserdata;
 
+import javax.annotation.Nullable;
+
 public class CustomInventoryHandler extends InventoryHandler {
 
 	/*
@@ -93,6 +95,25 @@ public class CustomInventoryHandler extends InventoryHandler {
 
 	@Override
 	public Collection<ItemStack> getExtraItems() {
+		return items.values();
+	}
+
+	@Override
+	public Collection<ItemStack> getExtraItemsUnverified(Integer... excluded) {
+
+		// Don't return the excluded values tho
+		Collection<ItemStack> ret = items.values();
+
+		// Remove excluded
+		for (Integer ex : excluded) {
+
+			// Get
+			ItemStack value = items.get(ex);
+
+			// Remove
+			ret.remove(value);
+		}
+
 		return items.values();
 	}
 

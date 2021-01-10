@@ -17,6 +17,8 @@ import net.Indyuce.inventory.api.NBTItem;
 import net.Indyuce.inventory.api.inventory.InventoryHandler;
 import net.Indyuce.inventory.version.ItemTag;
 
+import static org.bukkit.Bukkit.getServer;
+
 public class CustomSlot {
 
 	private final String id, name;
@@ -124,9 +126,11 @@ public class CustomSlot {
 	 *         custom restrictions and not for vanilla slot based restrictions
 	 */
 	public boolean checkSlotRestrictions(InventoryHandler player, ItemStack item) {
-		for (SlotRestriction restriction : restrictions)
-			if (!restriction.isVerified(player, this, item))
-				return false;
+		for (SlotRestriction restriction : restrictions) {
+
+			// Verifying
+			if (!restriction.isVerified(player, this, item)) { return false; }
+		}
 		return true;
 	}
 }

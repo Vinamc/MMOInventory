@@ -22,6 +22,9 @@ import net.Indyuce.mmoitems.api.Type.EquipmentSlot;
 import net.Indyuce.mmoitems.api.player.PlayerData;
 import net.Indyuce.mmoitems.comp.inventory.PlayerInventory;
 import net.mmogroup.mmolib.api.item.NBTItem;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import static org.bukkit.Bukkit.getServer;
 
 public class MMOItemsCompatibility implements PlayerInventory, Listener {
 	public MMOItemsCompatibility() {
@@ -31,22 +34,34 @@ public class MMOItemsCompatibility implements PlayerInventory, Listener {
 		 * register with delay because MMOInventory does not always enable after
 		 * MMOItems
 		 */
-		Bukkit.getScheduler().runTask(MMOInventory.plugin, () -> MMOItems.plugin.setPlayerInventory(MMOInventory.plugin.getConfig().getBoolean("ornaments-support") ? new OrnamentSupport() : this));
+		Bukkit.getScheduler().runTask(MMOInventory.plugin, () -> MMOItems.plugin.registerPlayerInventory(this));
 	}
 
 	@Override
 	public List<EquippedItem> getInventory(Player player) {
 		List<EquippedItem> list = new ArrayList<>();
-
-		list.add(new EquippedItem(player.getInventory().getItemInMainHand(), EquipmentSlot.MAIN_HAND));
-		list.add(new EquippedItem(player.getInventory().getItemInOffHand(), EquipmentSlot.OFF_HAND));
-
-		for (ItemStack armor : player.getInventory().getArmorContents())
-			list.add(new EquippedItem(armor, EquipmentSlot.ARMOR));
 		
 		MMOInventory.plugin.getDataManager().getInventory(player).getExtraItems().forEach(item -> list.add(new EquippedItem(item, EquipmentSlot.ACCESSORY)));
 
 		return list;
+	}
+
+	static String getItemName(ItemStack e) {
+		if (e == null) { return "null"; }
+
+		ItemMeta iMeta = e.getItemMeta();
+
+		if (iMeta == null) {
+			return e.getType().toString();
+		}
+
+		if (iMeta.hasDisplayName()) {
+
+			return iMeta.getDisplayName();
+		} else {
+
+			return e.getType().toString();
+		}
 	}
 
 	@EventHandler
@@ -58,28 +73,5 @@ public class MMOItemsCompatibility implements PlayerInventory, Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void b(ItemEquipEvent event) {
 		Bukkit.getScheduler().runTaskLater(MMOInventory.plugin, () -> PlayerData.get(event.getPlayer()).updateInventory(), 0);
-	}
-
-	public static class OrnamentSupport implements PlayerInventory {
-		@Override
-		public List<EquippedItem> getInventory(Player player) {
-			List<EquippedItem> list = new ArrayList<>();
-
-			list.add(new EquippedItem(player.getInventory().getItemInMainHand(), EquipmentSlot.MAIN_HAND));
-			list.add(new EquippedItem(player.getInventory().getItemInOffHand(), EquipmentSlot.OFF_HAND));
-
-			for (ItemStack armor : player.getInventory().getArmorContents())
-				list.add(new EquippedItem(armor, EquipmentSlot.ARMOR));
-
-			MMOInventory.plugin.getDataManager().getInventory(player).getExtraItems().forEach(item -> list.add(new EquippedItem(item, EquipmentSlot.ACCESSORY)));
-
-			for (ItemStack item : player.getInventory().getContents()) {
-				NBTItem nbtItem;
-				if (item != null && (nbtItem = NBTItem.get(item)).hasType() && Type.get(nbtItem.getType()).getEquipmentType() == EquipmentSlot.ANY)
-					list.add(new EquippedItem(nbtItem, EquipmentSlot.ANY));
-			}
-
-			return list;
-		}
 	}
 }
