@@ -7,7 +7,7 @@ import net.Indyuce.inventory.api.inventory.InventoryHandler;
 import net.Indyuce.inventory.api.slot.CustomSlot;
 import net.Indyuce.inventory.api.slot.SlotRestriction;
 import net.Indyuce.mmoitems.api.player.PlayerData;
-import net.mmogroup.mmolib.api.item.NBTItem;
+import io.lumine.mythic.lib.api.item.NBTItem;
 
 public class MMOItemsLevelRestriction extends SlotRestriction {
 

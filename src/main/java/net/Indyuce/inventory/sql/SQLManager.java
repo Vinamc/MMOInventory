@@ -1,18 +1,16 @@
 package net.Indyuce.inventory.sql;
 
+import com.google.gson.Gson;
+import io.lumine.mythic.lib.MythicLib;
+import io.lumine.mythic.lib.api.util.SimpleWrapper;
+import io.lumine.mythic.lib.sql.MMODataSource;
+import net.Indyuce.inventory.MMOInventory;
+import org.bukkit.inventory.ItemStack;
+
 import java.sql.SQLException;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-
-import org.bukkit.inventory.ItemStack;
-
-import com.google.gson.Gson;
-
-import net.Indyuce.inventory.MMOInventory;
-import net.mmogroup.mmolib.MMOLib;
-import net.mmogroup.mmolib.api.util.SimpleWrapper;
-import net.mmogroup.mmolib.sql.MMODataSource;
 
 public class SQLManager extends MMODataSource {
 	private final Gson gson = new Gson();
@@ -51,7 +49,7 @@ public class SQLManager extends MMODataSource {
 			getResultAsync("SELECT slot_index,stack FROM mmoinv_data WHERE id = '" + id + "'", (result) -> {
 				try {
 					if (result.first()) {
-						ItemStack stack = MMOLib.plugin.getJson().parse(result.getString("stack"), ItemStack.class);
+						ItemStack stack = MythicLib.plugin.getJson().parse(result.getString("stack"), ItemStack.class);
 						data.put(result.getInt("slot_index"), stack);
 					}
 				} catch (SQLException e) {

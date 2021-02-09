@@ -1,13 +1,11 @@
 package net.Indyuce.inventory.comp;
 
+import io.lumine.mythic.lib.api.item.NBTItem;
 import net.Indyuce.inventory.api.LineConfig;
 import net.Indyuce.inventory.api.inventory.InventoryHandler;
 import net.Indyuce.inventory.api.slot.CustomSlot;
 import net.Indyuce.inventory.api.slot.SlotRestriction;
-import net.mmogroup.mmolib.api.item.NBTItem;
 import org.bukkit.inventory.ItemStack;
-
-import static org.bukkit.Bukkit.getServer;
 
 public class MMOItemsUniqueRestriction extends SlotRestriction {
 

@@ -28,19 +28,28 @@
 			</plugin>
 		</plugins>
 	</build>
+	<repositories>
+		<repository>
+			<id>lumine-repo</id>
+			<url>https://mvn.lumine.io/repository/maven-public/</url>
+		</repository>
+		<repository>
+			<id>lumine-snapshots</id>
+			<url>http://mvn.lumine.io/repository/maven-snapshots/</url>
+		</repository>
+	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>net.Indyuce</groupId>
-			<artifactId>mmoitems</artifactId>
-			<version>6.5.1</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/MMOItems.jar</systemPath>
+			<artifactId>MMOItems</artifactId>
+			<version>6.5.2-SNAPSHOT</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>net.Indyuce</groupId>
-			<artifactId>MMOLib</artifactId>
-			<version>1.7.4</version>
-			<scope>compile</scope>
+			<groupId>io.lumine</groupId>
+			<artifactId>MythicLib</artifactId>
+			<version>1.0.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.spigotmc</groupId>
