@@ -28,35 +28,104 @@
 			</plugin>
 		</plugins>
 	</build>
+
 	<repositories>
+
 		<repository>
 			<id>lumine-repo</id>
 			<url>https://mvn.lumine.io/repository/maven-public/</url>
 		</repository>
-		<repository>
-			<id>lumine-snapshots</id>
-			<url>http://mvn.lumine.io/repository/maven-snapshots/</url>
-		</repository>
+
 	</repositories>
+
 	<dependencies>
+
 		<dependency>
 			<groupId>net.Indyuce</groupId>
 			<artifactId>MMOItems</artifactId>
-			<version>6.5.2-SNAPSHOT</version>
+			<version>6.6.0</version>
 			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>io.lumine</groupId>
 			<artifactId>MythicLib</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.1</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<!-- Spigot base API, MMOInv is natively built for 1.17 ie latest version -->
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>amalgam</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/spigot.jar</systemPath>
+			<version>1.17.1-R0.1-SNAPSHOT</version>
+			<scope>provided</scope>
 		</dependency>
+
+		<!-- NMS code -->
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-1.17</artifactId>
+			<version>dev</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-1.16.4</artifactId>
+			<version>dev</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-1.16.2</artifactId>
+			<version>dev</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-1.16.1</artifactId>
+			<version>dev</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-1.15</artifactId>
+			<version>dev</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-1.14</artifactId>
+			<version>dev</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-1.13.2</artifactId>
+			<version>dev</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-1.12.2</artifactId>
+			<version>dev</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+
 	</dependencies>
 </project>

@@ -1,10 +1,10 @@
 package net.Indyuce.inventory.comp;
 
+import io.lumine.mythic.lib.api.player.EquipmentSlot;
 import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.api.event.ItemEquipEvent;
 import net.Indyuce.inventory.gui.PlayerInventoryView;
 import net.Indyuce.mmoitems.MMOItems;
-import net.Indyuce.mmoitems.api.Type.EquipmentSlot;
 import net.Indyuce.mmoitems.api.player.PlayerData;
 import net.Indyuce.mmoitems.api.player.inventory.EquippedItem;
 import net.Indyuce.mmoitems.comp.inventory.PlayerInventory;
