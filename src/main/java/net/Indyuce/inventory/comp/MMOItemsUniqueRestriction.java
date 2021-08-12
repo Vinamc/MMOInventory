@@ -1,14 +1,13 @@
 package net.Indyuce.inventory.comp;
 
-import io.lumine.mythic.lib.api.item.NBTItem;
 import net.Indyuce.inventory.api.LineConfig;
+import net.Indyuce.inventory.api.NBTItem;
 import net.Indyuce.inventory.api.inventory.InventoryHandler;
 import net.Indyuce.inventory.api.slot.CustomSlot;
 import net.Indyuce.inventory.api.slot.SlotRestriction;
 import org.bukkit.inventory.ItemStack;
 
 public class MMOItemsUniqueRestriction extends SlotRestriction {
-
     private final boolean enabled;
 
     /**
@@ -18,6 +17,7 @@ public class MMOItemsUniqueRestriction extends SlotRestriction {
      */
     public MMOItemsUniqueRestriction(LineConfig config) {
         super(config);
+
         config.validate("enabled");
         enabled = config.getBoolean("enabled");
     }
@@ -30,19 +30,20 @@ public class MMOItemsUniqueRestriction extends SlotRestriction {
     public boolean isVerifying() { return verifying; }
 
     @Override
-    public boolean isVerified(InventoryHandler provider, CustomSlot slot, ItemStack item) {
+    public boolean isVerified(InventoryHandler provider, CustomSlot slot, NBTItem item) {
         if (!isEnabled()) { return true; }
         if (isVerifying()) { return false; }
         verifying = true;
 
-        String set = NBTItem.get(item).getString("MMOITEMS_ACCESSORY_SET");
+        String set = item.getString("MMOITEMS_ACCESSORY_SET");
 
         // Get Equipped Items
         for (ItemStack invItem : provider.getExtraItemsUnverified(slot.getIndex())) {
 
             // Same MMOItem?
-            boolean sameItem = getStringMMOItem(invItem).equalsIgnoreCase(getStringMMOItem(item));
-            boolean sameSet = (set != null) && (set.length() > 0) && set.equalsIgnoreCase(NBTItem.get(invItem).getString("MMOITEMS_ACCESSORY_SET"));
+            NBTItem nbtItem = NBTItem.get(invItem);
+            boolean sameItem = getStringMMOItem(nbtItem).equalsIgnoreCase(getStringMMOItem(item));
+            boolean sameSet = (set != null) && (set.length() > 0) && set.equalsIgnoreCase(nbtItem.getString("MMOITEMS_ACCESSORY_SET"));
 
             // Cancel if the mmoitem is the same or the set is the same.
             if (sameItem || sameSet) {
@@ -60,8 +61,7 @@ public class MMOItemsUniqueRestriction extends SlotRestriction {
         return enabled;
     }
 
-    private String getStringMMOItem(ItemStack item) {
-        NBTItem nbtItem = NBTItem.get(item);
-        return nbtItem.getString("MMOITEMS_ITEM_ID") + "." + nbtItem.getString("MMOITEMS_ITEM_TYPE");
+    private String getStringMMOItem(NBTItem item) {
+        return item.getString("MMOITEMS_ITEM_ID") + "." + item.getString("MMOITEMS_ITEM_TYPE");
     }
 }

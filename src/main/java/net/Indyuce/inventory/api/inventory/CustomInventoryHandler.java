@@ -1,5 +1,15 @@
 package net.Indyuce.inventory.api.inventory;
 
+import net.Indyuce.inventory.MMOInventory;
+import net.Indyuce.inventory.api.ConfigFile;
+import net.Indyuce.inventory.api.slot.CustomSlot;
+import net.Indyuce.inventory.api.slot.SlotType;
+import net.Indyuce.inventory.sql.SQLUserdata;
+import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,19 +17,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-
-import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
-import net.Indyuce.inventory.MMOInventory;
-import net.Indyuce.inventory.api.ConfigFile;
-import net.Indyuce.inventory.api.slot.CustomSlot;
-import net.Indyuce.inventory.api.slot.SlotType;
-import net.Indyuce.inventory.sql.SQLUserdata;
-
-import javax.annotation.Nullable;
 
 public class CustomInventoryHandler extends InventoryHandler {
 
@@ -90,7 +87,11 @@ public class CustomInventoryHandler extends InventoryHandler {
 	}
 
 	public ItemStack getItem(int slot) {
-		return items.containsKey(slot) ? items.get(slot) : null;
+		return items.get(slot);
+	}
+
+	public boolean hasItem(CustomSlot slot) {
+		return items.containsKey(slot);
 	}
 
 	@Override

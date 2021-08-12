@@ -1,18 +1,16 @@
 package net.Indyuce.inventory.api.inventory;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
+import net.Indyuce.inventory.MMOInventory;
+import net.Indyuce.inventory.api.NBTItem;
+import net.Indyuce.inventory.api.slot.CustomSlot;
+import net.Indyuce.inventory.api.slot.SlotType;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import net.Indyuce.inventory.MMOInventory;
-import net.Indyuce.inventory.api.slot.CustomSlot;
-import net.Indyuce.inventory.api.slot.SlotType;
-
-import static org.bukkit.Bukkit.getServer;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SimpleInventoryHandler extends InventoryHandler {
 
@@ -34,23 +32,14 @@ public class SimpleInventoryHandler extends InventoryHandler {
 		return getItems(false, excluded);
 	}
 
-	Collection<ItemStack> getItems(boolean verify, Integer... excluded) {
+	private Collection<ItemStack> getItems(boolean verify, Integer... excluded) {
 		Set<ItemStack> set = new HashSet<>();
 
 		// For each special slot
 		for (CustomSlot slot : MMOInventory.plugin.getSlotManager().getLoaded()) {
 
-			// Is it excluded?
-			boolean isExcluded = false;
-			for (Integer ex : excluded) {
-				if (ex == slot.getIndex()) {
-					isExcluded = true;
-					break;
-				}
-			}
-
 			// If its an accessory
-			if (!isExcluded && slot.getType() == SlotType.ACCESSORY) {
+			if (!isExcluded(slot, excluded) && slot.getType() == SlotType.ACCESSORY) {
 
 				// Get that item
 				ItemStack item = player.getInventory().getItem(slot.getIndex());
@@ -58,11 +47,8 @@ public class SimpleInventoryHandler extends InventoryHandler {
 				// Is the item not a 'default' MMOInventory display thingy
 				if (!MMOInventory.plugin.getVersionWrapper().getNBTItem(item).hasTag("MMOInventoryGuiItem") && !isAir(item)) {
 
-					// Should it be verified?
-					boolean verified = !verify;
-					if (!verified) {
-						verified = slot.checkSlotRestrictions(this, item);
-					}
+					// Should it be verified? (Utilizing java operator short-circuiting!!)
+					boolean verified = !verify || slot.checkSlotRestrictions(this, NBTItem.get(item));
 
 					// Does it exist? Is it not a 'default' slot item? Does it meet slot restrictions?
 					if (verified) {
@@ -77,10 +63,22 @@ public class SimpleInventoryHandler extends InventoryHandler {
 		return set;
 	}
 
+	private boolean isExcluded(CustomSlot slot, Integer... excludedIndexes) {
+		for (int excluded : excludedIndexes)
+			if (excluded == slot.getIndex())
+				return true;
+		return false;
+	}
+
 	@Override
-	public void whenSaved() {}
+	public void whenSaved() {
+		// Bukkit does all the work, yeet
+	}
+
 	@Override
-	public void whenSavedSQL() {}
+	public void whenSavedSQL() {
+		// Bukkit does all the work, yeet
+	}
 
 	private boolean isAir(ItemStack item) {
 		return item == null || item.getType() == Material.AIR;

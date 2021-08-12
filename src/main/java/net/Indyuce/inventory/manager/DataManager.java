@@ -1,18 +1,17 @@
 package net.Indyuce.inventory.manager;
 
+import net.Indyuce.inventory.MMOInventory;
+import net.Indyuce.inventory.api.inventory.CustomInventoryHandler;
+import net.Indyuce.inventory.api.inventory.InventoryHandler;
+import org.apache.commons.lang.Validate;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
-
-import org.apache.commons.lang.Validate;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
-
-import net.Indyuce.inventory.MMOInventory;
-import net.Indyuce.inventory.api.inventory.CustomInventoryHandler;
-import net.Indyuce.inventory.api.inventory.InventoryHandler;
 
 public class DataManager {
 	private final Map<UUID, InventoryHandler> inventories = new HashMap<>();
@@ -54,15 +53,15 @@ public class DataManager {
 		if (!inventories.containsKey(player.getUniqueId()))
 			inventories.put(player.getUniqueId(), load.apply(player));
 
-		/*
-		 * Or else refresh player instance
-		 */
+			/*
+			 * Or else refresh player instance
+			 */
 		else
-			getInventory(player.getUniqueId()).setPlayer(player);
+			getInventory(player.getUniqueId()).updatePlayer(player);
 	}
 
 	public void unloadData(OfflinePlayer player) {
-		inventories.remove(player.getUniqueId());
+		unloadData(player.getUniqueId());
 	}
 
 	public void unloadData(UUID uuid) {

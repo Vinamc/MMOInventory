@@ -1,27 +1,34 @@
 package net.Indyuce.inventory.api.inventory;
 
-import java.util.Collection;
-
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public abstract class InventoryHandler {
+import java.util.Collection;
+import java.util.UUID;
 
-	/*
-	 * Player instance not final because it needs to be updated every time the
-	 * player joins; this instance is used to equip vanilla items
+public abstract class InventoryHandler {
+	private final UUID uuid;
+
+	/**
+	 * Player instance is not final because it needs to be updated every time
+	 * the player joins; this instance is used to equip vanilla items
 	 */
 	protected Player player;
 
 	public InventoryHandler(Player player) {
 		this.player = player;
+		this.uuid = player.getUniqueId();
+	}
+
+	public UUID getUniqueId() {
+		return uuid;
 	}
 
 	public Player getPlayer() {
 		return player;
 	}
 
-	public void setPlayer(Player player) {
+	public void updatePlayer(Player player) {
 		this.player = player;
 	}
 
@@ -46,5 +53,6 @@ public abstract class InventoryHandler {
 	 * save the data in a config file if needed
 	 */
 	public abstract void whenSaved();
+
 	public abstract void whenSavedSQL();
 }

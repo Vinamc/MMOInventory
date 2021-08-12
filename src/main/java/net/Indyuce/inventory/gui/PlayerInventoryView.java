@@ -1,8 +1,11 @@
 package net.Indyuce.inventory.gui;
 
-import java.util.Arrays;
-import java.util.List;
-
+import net.Indyuce.inventory.MMOInventory;
+import net.Indyuce.inventory.api.NBTItem;
+import net.Indyuce.inventory.api.event.ItemEquipEvent;
+import net.Indyuce.inventory.api.inventory.CustomInventoryHandler;
+import net.Indyuce.inventory.api.slot.CustomSlot;
+import net.Indyuce.inventory.api.slot.SlotType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -12,12 +15,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import net.Indyuce.inventory.MMOInventory;
-import net.Indyuce.inventory.api.NBTItem;
-import net.Indyuce.inventory.api.event.ItemEquipEvent;
-import net.Indyuce.inventory.api.inventory.CustomInventoryHandler;
-import net.Indyuce.inventory.api.slot.CustomSlot;
-import net.Indyuce.inventory.api.slot.SlotType;
+import java.util.Arrays;
+import java.util.List;
 
 public class PlayerInventoryView implements InventoryHolder {
 	private final CustomInventoryHandler data;
@@ -80,8 +79,57 @@ public class PlayerInventoryView implements InventoryHolder {
 		}
 
 		/*
-		 * Supported clicks TODO add support for shift click with a feature that
-		 * detects the slot he can put the item in
+		 * Shift clicking finds the ONE slot that can host your item
+		 * and automatically sends it there. There's a distinction to
+		 * be made between clicking in the player inventory and clicking
+		 * on an item which has already been equipped and which has to
+		 * be sent back to the player's inventory.
+		 *
+		 * There's also a problem with item amounts? It's much simpler
+		 * to just place all the stacked items as it's anyways quite
+		 * rare to have accessories with max stacks size greater than 1
+		 */
+		if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+			event.setCancelled(true);
+
+			// Nothing to do
+			if (isAir(event.getCurrentItem()))
+				return;
+
+			if (event.getClickedInventory().equals(event.getView().getBottomInventory())) {
+
+				// Find the best slot available
+				NBTItem picked = NBTItem.get(event.getCurrentItem());
+				CustomSlot best = findBestSlot(picked);
+				if (best == null)
+					return;
+
+				data.setItem(best, picked.getItem());
+				event.getInventory().setItem(best.getIndex(), picked.getItem());
+				event.setCurrentItem(null);
+
+			} else {
+
+				// Get the clicked slot
+				CustomSlot slot = MMOInventory.plugin.getSlotManager().get(event.getRawSlot());
+				if (slot == null)
+					return;
+
+				// Find a place where to put the item
+				int empty = player.getInventory().firstEmpty();
+				if (empty == -1)
+					return;
+
+				data.setItem(slot, null);
+				player.getInventory().setItem(empty, event.getCurrentItem());
+				event.setCurrentItem(slot.getItem());
+			}
+
+			return;
+		}
+
+		/*
+		 * Only a few types of clicks are supported
 		 */
 		if (!supported.contains(event.getAction())) {
 			event.setCancelled(true);
@@ -89,32 +137,27 @@ public class PlayerInventoryView implements InventoryHolder {
 		}
 
 		/*
-		 * Make sure the player is not trying to equip and item in a filler slot
-		 * (bug fix)
+		 * Make sure the player is not trying to
+		 * equip and item in a filler slot (bug fix)
 		 */
-		if (!isAir(event.getCurrentItem()) && event.getCurrentItem().isSimilar(MMOInventory.plugin.getSlotManager().getFiller().getItem())) {
+		NBTItem picked = MMOInventory.plugin.getVersionWrapper().getNBTItem(event.getCurrentItem());
+		if (!isAir(event.getCurrentItem()) && picked.getString("MMOInventoryGuiItem").equals("FILL")) {
 			event.setCancelled(true);
 			return;
 		}
 
-		// check if item can be equipped (apply slot restrictions)
+		// Check if item can be equipped (apply slot restrictions)
 		CustomSlot slot = MMOInventory.plugin.getSlotManager().get(event.getRawSlot());
 		if (slot != null && !isAir(event.getCursor())) {
 
-			// prevents equipping stacked items
+			// Prevents equipping stacked items
 			if (MMOInventory.plugin.getConfig().getBoolean("disable-equiping-stacked-items", true) && event.getCursor().getAmount() > 1) {
 				event.setCancelled(true);
 				return;
 			}
 
-			// vanilla slots requirements check
-			if (slot.getType() != SlotType.ACCESSORY && !slot.getType().getVanillaSlotHandler().canEquip(event.getCursor())) {
-				event.setCancelled(true);
-				return;
-			}
-
-			// check for custom slot restrictions
-			if (!slot.checkSlotRestrictions(data, event.getCursor())) {
+			// Check for vanilla AND custom slot restrictions
+			if (!slot.canHost(data, NBTItem.get(event.getCursor()))) {
 				event.setCancelled(true);
 				return;
 			}
@@ -125,7 +168,6 @@ public class PlayerInventoryView implements InventoryHolder {
 		 * equipped) with the current item ie the inventory slot item (eg
 		 * Chestplate Slot). The inventory slot must be deleted
 		 */
-		NBTItem picked = MMOInventory.plugin.getVersionWrapper().getNBTItem(event.getCurrentItem());
 		if (picked.hasTag("MMOInventoryGuiItem") && (isAir(event.getCursor()) || picked.getString("MMOInventoryGuiItem").equals("FILL"))) {
 			event.setCancelled(true);
 			return;
@@ -161,6 +203,23 @@ public class PlayerInventoryView implements InventoryHolder {
 			if (isAir(event.getCursor()))
 				Bukkit.getScheduler().runTaskLater(MMOInventory.plugin, () -> event.getInventory().setItem(slot.getIndex(), slot.getItem()), 0);
 		}
+	}
+
+	/**
+	 * Used when shift clicking to find the best slot
+	 * available for a specific item.
+	 *
+	 * @param item The item being shift clicked
+	 * @return The best slot available for that item, or none if there isn't any.
+	 *         Shift clicking should not do anything then
+	 */
+	private CustomSlot findBestSlot(NBTItem item) {
+
+		for (CustomSlot slot : MMOInventory.plugin.getSlotManager().getLoaded())
+			if ((slot.getType().isCustom() || slot.getType().getVanillaSlotHandler().supportsShiftClick()) && !data.hasItem(slot) && slot.canHost(data, item))
+				return slot;
+
+		return null;
 	}
 
 	// checks for both null and AIR material

@@ -1,10 +1,10 @@
 package net.Indyuce.inventory.api.slot;
 
+import net.Indyuce.inventory.MMOInventory;
+import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import net.Indyuce.inventory.MMOInventory;
 
 public enum SlotType {
 
@@ -27,6 +27,11 @@ public enum SlotType {
 		public ItemStack retrieveItem(Player player) {
 			return player.getInventory().getHelmet();
 		}
+
+		@Override
+		public boolean supportsShiftClick() {
+			return true;
+		}
 	}),
 
 	/**
@@ -47,6 +52,11 @@ public enum SlotType {
 		@Override
 		public ItemStack retrieveItem(Player player) {
 			return player.getInventory().getChestplate();
+		}
+
+		@Override
+		public boolean supportsShiftClick() {
+			return true;
 		}
 	}),
 
@@ -69,6 +79,11 @@ public enum SlotType {
 		public ItemStack retrieveItem(Player player) {
 			return player.getInventory().getLeggings();
 		}
+
+		@Override
+		public boolean supportsShiftClick() {
+			return true;
+		}
 	}),
 
 	/**
@@ -89,6 +104,11 @@ public enum SlotType {
 		@Override
 		public ItemStack retrieveItem(Player player) {
 			return player.getInventory().getBoots();
+		}
+
+		@Override
+		public boolean supportsShiftClick() {
+			return true;
 		}
 	}),
 
@@ -111,6 +131,11 @@ public enum SlotType {
 		public ItemStack retrieveItem(Player player) {
 			return player.getInventory().getItemInOffHand();
 		}
+
+		@Override
+		public boolean supportsShiftClick() {
+			return false;
+		}
 	}),
 
 	/**
@@ -131,10 +156,9 @@ public enum SlotType {
 
 	/**
 	 * @return If the custom slot is NOT a vanilla slot
-	 * @deprecated Check if it is SlotType.ACCESSORY instead
 	 */
-	@Deprecated
 	public boolean isCustom() {
+		Validate.isTrue(this != FILL, "FILL is not an item slot");
 		return this == ACCESSORY;
 	}
 

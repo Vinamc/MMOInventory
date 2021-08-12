@@ -1,8 +1,10 @@
 package net.Indyuce.inventory.api.slot;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import net.Indyuce.inventory.MMOInventory;
+import net.Indyuce.inventory.api.LineConfig;
+import net.Indyuce.inventory.api.NBTItem;
+import net.Indyuce.inventory.api.inventory.InventoryHandler;
+import net.Indyuce.inventory.version.ItemTag;
 import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -11,13 +13,8 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.Indyuce.inventory.MMOInventory;
-import net.Indyuce.inventory.api.LineConfig;
-import net.Indyuce.inventory.api.NBTItem;
-import net.Indyuce.inventory.api.inventory.InventoryHandler;
-import net.Indyuce.inventory.version.ItemTag;
-
-import static org.bukkit.Bukkit.getServer;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CustomSlot {
 
@@ -34,7 +31,7 @@ public class CustomSlot {
 
 	/**
 	 * Used to register custom RPG inventory slots from other plugins
-	 * 
+	 *
 	 * @param id
 	 *            The custom slot id (CHESTPLATE)
 	 * @param name
@@ -120,17 +117,27 @@ public class CustomSlot {
 	}
 
 	/**
-	 * @param item
-	 *            The item being equipped in the slot
+	 * @param player Data of the player equipping the item
+	 * @param item   The item being equipped in the slot
 	 * @return If the item can be equipped in that slot. This only checks for
-	 *         custom restrictions and not for vanilla slot based restrictions
+	 *         custom restrictions and NOT for vanilla slot based restrictions.
+	 *         See {@link #canHost(InventoryHandler, NBTItem)}
 	 */
-	public boolean checkSlotRestrictions(InventoryHandler player, ItemStack item) {
-		for (SlotRestriction restriction : restrictions) {
+	public boolean checkSlotRestrictions(InventoryHandler player, NBTItem item) {
+		for (SlotRestriction restriction : restrictions)
+			if (!restriction.isVerified(player, this, item))
+				return false;
 
-			// Verifying
-			if (!restriction.isVerified(player, this, item)) { return false; }
-		}
 		return true;
+	}
+
+	/**
+	 * @param player Data of the player equipping the item
+	 * @param item   The item being equipped in the slot
+	 * @return If the item can be equipped in that slot. This checks for
+	 *         both custom AND vanilla slot restrictions
+	 */
+	public boolean canHost(InventoryHandler player, NBTItem item) {
+		return getType().isCustom() ? checkSlotRestrictions(player, item) : getType().getVanillaSlotHandler().canEquip(item.getItem());
 	}
 }

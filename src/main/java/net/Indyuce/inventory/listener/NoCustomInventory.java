@@ -32,7 +32,8 @@ public class NoCustomInventory implements Listener {
 		Player player = event.getPlayer();
 		for (CustomSlot slot : MMOInventory.plugin.getSlotManager().getCustomSlots()) {
 			ItemStack current = player.getInventory().getItem(slot.getIndex());
-			if (slot.checkSlotRestrictions(MMOInventory.plugin.getDataManager().getInventory(player), current))
+			NBTItem currentNbt = NBTItem.get(current);
+			if (slot.checkSlotRestrictions(MMOInventory.plugin.getDataManager().getInventory(player), currentNbt))
 				continue;
 
 			player.getInventory().setItem(slot.getIndex(), slot.getItem());
@@ -41,7 +42,7 @@ public class NoCustomInventory implements Listener {
 			 * Drops the item that was previously in that slot only if it was
 			 * not a special MMOInv gui item
 			 */
-			if (current != null && current.getType() != Material.AIR && !NBTItem.get(current).hasTag("MMOInventoryGuiItem"))
+			if (current != null && current.getType() != Material.AIR && !currentNbt.hasTag("MMOInventoryGuiItem"))
 				for (ItemStack drop : player.getInventory().addItem(current).values())
 					player.getWorld().dropItem(player.getLocation(), drop);
 		}
@@ -77,7 +78,7 @@ public class NoCustomInventory implements Listener {
 				if (iSlot.getType().getVanillaSlotHandler() != null) { canEquip = iSlot.getType().getVanillaSlotHandler().canEquip(event.getCursor()); }
 
 				// Does the player bypass restrictions?
-				boolean meetsRestrictions = iSlot.checkSlotRestrictions(iHandler, iCursor);
+				boolean meetsRestrictions = iSlot.checkSlotRestrictions(iHandler, NBTItem.get(iCursor));
 
 				// Cancel event if these go wrong
 				if ((!isAccessory && !canEquip) || !meetsRestrictions) {
