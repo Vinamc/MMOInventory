@@ -1,4 +1,4 @@
-package net.Indyuce.inventory.sql;
+package net.Indyuce.inventory.manager.sql;
 
 import com.google.gson.Gson;
 import io.lumine.mythic.lib.MythicLib;

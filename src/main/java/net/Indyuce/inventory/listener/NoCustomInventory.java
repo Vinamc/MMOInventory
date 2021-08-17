@@ -1,11 +1,10 @@
 package net.Indyuce.inventory.listener;
 
-import java.util.Iterator;
-
+import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.api.event.ItemEquipEvent;
-import net.Indyuce.inventory.api.inventory.InventoryHandler;
-import net.Indyuce.inventory.api.slot.SlotType;
-import net.Indyuce.mmoitems.api.player.PlayerData;
+import net.Indyuce.inventory.inventory.InventoryHandler;
+import net.Indyuce.inventory.slot.CustomSlot;
+import net.Indyuce.inventory.version.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -13,16 +12,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
-import net.Indyuce.inventory.MMOInventory;
-import net.Indyuce.inventory.api.NBTItem;
-import net.Indyuce.inventory.api.slot.CustomSlot;
-
-import static org.bukkit.Bukkit.getServer;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 public class NoCustomInventory implements Listener {
 
@@ -31,92 +29,92 @@ public class NoCustomInventory implements Listener {
 
 		Player player = event.getPlayer();
 		for (CustomSlot slot : MMOInventory.plugin.getSlotManager().getCustomSlots()) {
-			ItemStack current = player.getInventory().getItem(slot.getIndex());
-			NBTItem currentNbt = NBTItem.get(current);
-			if (slot.checkSlotRestrictions(MMOInventory.plugin.getDataManager().getInventory(player), currentNbt))
+			NBTItem currentNbt = NBTItem.get(player.getInventory().getItem(slot.getIndex()));
+			if (!isAir(currentNbt.getItem()) && slot.checkSlotRestrictions(MMOInventory.plugin.getDataManager().getInventory(player), currentNbt))
 				continue;
 
 			player.getInventory().setItem(slot.getIndex(), slot.getItem());
 
 			/*
 			 * Drops the item that was previously in that slot only if it was
-			 * not a special MMOInv gui item
+			 * not a special MMOInv gui item. This happens when players log in
+			 * FOR THE FIRST TIME after the server owner has toggled on the
+			 * no-custom-inv option.
+			 *
+			 * This issue does not happen on future logins yet can be game breaking.
 			 */
-			if (current != null && current.getType() != Material.AIR && !currentNbt.hasTag("MMOInventoryGuiItem"))
-				for (ItemStack drop : player.getInventory().addItem(current).values())
+			if (!isAir(currentNbt.getItem()) && !currentNbt.hasTag("MMOInventoryGuiItem"))
+				for (ItemStack drop : player.getInventory().addItem(currentNbt.getItem()).values())
 					player.getWorld().dropItem(player.getLocation(), drop);
 		}
 	}
 
+	private static final List<InventoryAction> supported = Arrays.asList(InventoryAction.PICKUP_ALL, InventoryAction.PLACE_ALL, InventoryAction.SWAP_WITH_CURSOR);
+
+	/**
+	 * Note: this code is very similar to the same code when a player
+	 * tries to equip an item in the custom RPG inventory.
+	 * <p>
+	 * See {@link net.Indyuce.inventory.gui.PlayerInventoryView#whenClicked(InventoryClickEvent)}
+	 * for more information. It is likely that a change in one of these two
+	 * would require a change in both actually.
+	 */
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void placeBackSlotItems(InventoryClickEvent event) {
+
+		// This only works in the player's inventory
 		Player player = (Player) event.getWhoClicked();
+		if (!event.getClickedInventory().equals(player.getInventory()))
+			return;
 
-		/*
-		 * If the item picked up is a special slot item, delete it
-		 */
-		if (MMOInventory.plugin.getVersionWrapper().getNBTItem(event.getCurrentItem()).hasTag("MMOInventoryGuiItem")) { event.setCurrentItem(null); }
+		// Find custom slot
+		CustomSlot slot = MMOInventory.plugin.getSlotManager().get(event.getSlot());
+		if (slot == null)
+			return;
 
-		/*
-		 * Check that the item can be placed in that slot. Cancel the event if it cant be.
-		 */
-		InventoryHandler iHandler = MMOInventory.plugin.getDataManager().getInventory(player);
-		ItemStack iCursor = event.getCursor();
-		if (!isAir(iCursor)) {
+		if (!supported.contains(event.getAction())) {
+			event.setCancelled(true);
+			return;
+		}
 
-			// Get Slot
-			CustomSlot iSlot = MMOInventory.plugin.getSlotManager().get(event.getRawSlot());
+		// Player tries to pickup a slot item, without equipping any
+		NBTItem item = NBTItem.get(event.getCurrentItem());
+		if (isAir(event.getCursor()) && item.hasTag("MMOInventoryGuiItem")) {
+			event.setCancelled(true);
+			return;
+		}
 
-			// Existed?
-			if (iSlot != null) {
+		// Check for BOTH custom/vanilla slot restrictions
+		NBTItem cursor = NBTItem.get(event.getCursor());
+		InventoryHandler handler = MMOInventory.plugin.getDataManager().getInventory(player);
+		if (!slot.canHost(handler, cursor)) {
+			event.setCancelled(true);
+			return;
+		}
 
-				// Is it a custom accessory slot?
-				boolean isAccessory = iSlot.getType() == SlotType.ACCESSORY;
-
-				// Can the player equip thay item?
-				boolean canEquip = true;
-				if (iSlot.getType().getVanillaSlotHandler() != null) { canEquip = iSlot.getType().getVanillaSlotHandler().canEquip(event.getCursor()); }
-
-				// Does the player bypass restrictions?
-				boolean meetsRestrictions = iSlot.checkSlotRestrictions(iHandler, NBTItem.get(iCursor));
-
-				// Cancel event if these go wrong
-				if ((!isAccessory && !canEquip) || !meetsRestrictions) {
-
-					// Due to reasons above, this item cannot be quipped.
-					event.setCancelled(true);
-
-				// Player may equip this item in thay slot
-				} else {
-
-					// Run Equip Event
-					ItemEquipEvent equipEvent = new ItemEquipEvent(player, iCursor, iSlot);
-					Bukkit.getPluginManager().callEvent(equipEvent);
-
-					// Was it cancelled??
-					if (equipEvent.isCancelled()) {
-
-						// Cancel this event
-						event.setCancelled(true);
-					}
-				}
-			}
+		// Call Bukkit event
+		ItemEquipEvent.EquipAction action = isAir(event.getCursor()) ? ItemEquipEvent.EquipAction.UNEQUIP : cursor.hasTag("MMOInventoryGuiItem") ? ItemEquipEvent.EquipAction.EQUIP : ItemEquipEvent.EquipAction.SWAP_ITEMS;
+		ItemEquipEvent called = new ItemEquipEvent(player, event.getCursor(), slot, action);
+		Bukkit.getPluginManager().callEvent(called);
+		if (called.isCancelled()) {
+			event.setCancelled(true);
+			return;
 		}
 
 		/*
-		 * If there is no item in the slot item, place the slot item back
+		 * If the player has picked up an inventory slot item, remove it
+		 * instantly after checking the equip event was not canceled (bug
+		 * fix)
 		 */
-		Bukkit.getScheduler().runTask(MMOInventory.plugin, () -> {
-			boolean needsUpdate = false;
-			for (CustomSlot slot : MMOInventory.plugin.getSlotManager().getCustomSlots()) {
-				if (isAir(player.getInventory().getItem(slot.getIndex()))) {
-					player.getInventory().setItem(slot.getIndex(), slot.getItem());
-					player.updateInventory();
-					needsUpdate = true;
-				}
-			}
-			if (needsUpdate) { PlayerData.get(player).updateInventory();}
-		});
+		if (MMOInventory.plugin.getVersionWrapper().getNBTItem(event.getCurrentItem()).hasTag("MMOInventoryGuiItem"))
+			event.setCurrentItem(null);
+
+		/*
+		 * If the player is taking away an item without swapping it, place
+		 * the inventory slot item back in the corresponding slot
+		 */
+		if (isAir(event.getCursor()))
+			Bukkit.getScheduler().runTask(MMOInventory.plugin, () -> player.getInventory().setItem(slot.getIndex(), slot.getItem()));
 	}
 
 	@EventHandler

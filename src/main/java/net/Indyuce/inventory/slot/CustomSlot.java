@@ -1,10 +1,10 @@
-package net.Indyuce.inventory.api.slot;
+package net.Indyuce.inventory.slot;
 
 import net.Indyuce.inventory.MMOInventory;
-import net.Indyuce.inventory.api.LineConfig;
-import net.Indyuce.inventory.api.NBTItem;
-import net.Indyuce.inventory.api.inventory.InventoryHandler;
+import net.Indyuce.inventory.inventory.InventoryHandler;
+import net.Indyuce.inventory.util.LineConfig;
 import net.Indyuce.inventory.version.ItemTag;
+import net.Indyuce.inventory.version.NBTItem;
 import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CustomSlot {
-
 	private final String id, name;
 	private final SlotType type;
 	private final int slot;
@@ -51,7 +50,7 @@ public class CustomSlot {
 		this.type = type;
 		this.item = item;
 
-		// this makes sure any fill slot does not interfere with other slots
+		// This makes sure any fill slot does not interfere with other slots
 		this.slot = type == SlotType.FILL ? -1 : slot;
 	}
 
@@ -101,13 +100,6 @@ public class CustomSlot {
 		return slot;
 	}
 
-	/**
-	 * @return If it is a valid custom slot ie if it is not a filler item
-	 */
-	public boolean isValid() {
-		return type != SlotType.FILL;
-	}
-
 	public SlotType getType() {
 		return type;
 	}
@@ -132,6 +124,9 @@ public class CustomSlot {
 	}
 
 	/**
+	 * The best method to check if an item can host another item. This can
+	 * be used for BOTH vanilla slot and custom slots!
+	 *
 	 * @param player Data of the player equipping the item
 	 * @param item   The item being equipped in the slot
 	 * @return If the item can be equipped in that slot. This checks for

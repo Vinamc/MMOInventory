@@ -1,4 +1,4 @@
-package net.Indyuce.inventory.sql;
+package net.Indyuce.inventory.manager.sql;
 
 import java.util.HashMap;
 import java.util.Map;

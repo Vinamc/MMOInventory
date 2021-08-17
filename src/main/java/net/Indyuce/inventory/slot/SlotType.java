@@ -1,4 +1,4 @@
-package net.Indyuce.inventory.api.slot;
+package net.Indyuce.inventory.slot;
 
 import net.Indyuce.inventory.MMOInventory;
 import org.apache.commons.lang.Validate;

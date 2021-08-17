@@ -1,8 +1,7 @@
 package net.Indyuce.inventory.manager;
 
-import net.Indyuce.inventory.MMOInventory;
-import net.Indyuce.inventory.api.inventory.CustomInventoryHandler;
-import net.Indyuce.inventory.api.inventory.InventoryHandler;
+import net.Indyuce.inventory.inventory.CustomInventoryHandler;
+import net.Indyuce.inventory.inventory.InventoryHandler;
 import org.apache.commons.lang.Validate;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -13,7 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
-public class DataManager {
+public abstract class DataManager {
 	private final Map<UUID, InventoryHandler> inventories = new HashMap<>();
 
 	/**
@@ -47,15 +46,11 @@ public class DataManager {
 
 	public void setupData(Player player) {
 
-		/*
-		 * Setup inventory data if not setup
-		 */
+		// Setup inventory data if not setup
 		if (!inventories.containsKey(player.getUniqueId()))
 			inventories.put(player.getUniqueId(), load.apply(player));
 
-			/*
-			 * Or else refresh player instance
-			 */
+			// Or else refresh player instance
 		else
 			getInventory(player.getUniqueId()).updatePlayer(player);
 	}
@@ -72,17 +67,33 @@ public class DataManager {
 		return inventories.values();
 	}
 
-	public void save() {
-		inventories.values().forEach(data -> {
-			if(MMOInventory.plugin.getSQLManager().isEnabled()) data.whenSavedSQL();
-			else data.whenSaved();
-		});
+	/**
+	 * Called when the server stops
+	 */
+	public abstract void save();
+
+	/**
+	 * This only needs to do something when the custom inventory handler
+	 * is enabled. If items are stored in the player vanilla item, nothing
+	 * will be called.
+	 *
+	 * @param player Player data to save
+	 */
+	public void save(OfflinePlayer player) {
+		InventoryHandler handler = getInventory(player);
+		if (handler instanceof CustomInventoryHandler)
+			save((CustomInventoryHandler) handler);
 	}
-	
-	public void save(Player player) {
-		InventoryHandler data = inventories.get(player.getUniqueId());
-		if(MMOInventory.plugin.getSQLManager().isEnabled())
-			data.whenSavedSQL();
-		else data.whenSaved();
-	}
+
+	/**
+	 * Called either when the server stops, or when the 'save-on-log-off'
+	 * option is toggled on and the player leaves the server. This has
+	 * the effect of saving player data
+	 */
+	public abstract void save(CustomInventoryHandler data);
+
+	/**
+	 * Called when a player logs on the server and his data has to be loaded.
+	 */
+	public abstract void load(CustomInventoryHandler data);
 }

@@ -1,4 +1,4 @@
-package net.Indyuce.inventory.api;
+package net.Indyuce.inventory.util;
 
 import org.apache.commons.lang.Validate;
 

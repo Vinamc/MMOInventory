@@ -1,4 +1,4 @@
-package net.Indyuce.inventory.api.slot;
+package net.Indyuce.inventory.slot;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

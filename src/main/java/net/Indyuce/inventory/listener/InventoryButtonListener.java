@@ -14,7 +14,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.MMOInventory;
-import net.Indyuce.inventory.api.InventoryButton;
+import net.Indyuce.inventory.util.InventoryButton;
 import net.Indyuce.inventory.gui.PlayerInventoryView;
 
 public class InventoryButtonListener implements Listener {

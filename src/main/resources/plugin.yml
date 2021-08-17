@@ -3,7 +3,7 @@ version: ${project.version}
 main: net.Indyuce.inventory.MMOInventory
 author: Indyuce
 description: ${project.description}
-depend: [MythicLib, MMOItems]
+softdepend: [MythicLib,MMOItems]
 api-version: 1.13
 commands:
     mmoinventory:

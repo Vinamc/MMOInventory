@@ -1,68 +1,60 @@
 package net.Indyuce.inventory;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.logging.Level;
-
-import net.Indyuce.inventory.comp.MMOItemsUniqueRestriction;
-import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.event.Listener;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import net.Indyuce.inventory.api.ConfigFile;
-import net.Indyuce.inventory.api.inventory.SimpleInventoryHandler;
 import net.Indyuce.inventory.command.MMOInventoryCommand;
 import net.Indyuce.inventory.command.MMOInventoryCompletion;
-import net.Indyuce.inventory.comp.MMOItemsCompatibility;
-import net.Indyuce.inventory.comp.MMOItemsLevelRestriction;
-import net.Indyuce.inventory.comp.MMOItemsTypeRestriction;
-import net.Indyuce.inventory.listener.DeathDrops;
-import net.Indyuce.inventory.listener.GuiListener;
-import net.Indyuce.inventory.listener.InventoryButtonListener;
-import net.Indyuce.inventory.listener.NoCustomInventory;
-import net.Indyuce.inventory.listener.PlayerListener;
-import net.Indyuce.inventory.listener.ResourcePack;
-import net.Indyuce.inventory.listener.SaveOnLeave;
+import net.Indyuce.inventory.compat.InventoryUpdater;
+import net.Indyuce.inventory.compat.mmoitems.MMOItemsCompatibility;
+import net.Indyuce.inventory.inventory.SimpleInventoryHandler;
+import net.Indyuce.inventory.listener.*;
 import net.Indyuce.inventory.manager.DataManager;
 import net.Indyuce.inventory.manager.SlotManager;
-import net.Indyuce.inventory.sql.SQLManager;
+import net.Indyuce.inventory.manager.YamlDataManager;
+import net.Indyuce.inventory.manager.sql.SQLDataManager;
+import net.Indyuce.inventory.util.ConfigFile;
 import net.Indyuce.inventory.version.ServerVersion;
 import net.Indyuce.inventory.version.wrapper.VersionWrapper;
 import net.Indyuce.inventory.version.wrapper.VersionWrapper_Reflection;
+import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
 
 public class MMOInventory extends JavaPlugin implements Listener {
 	public static MMOInventory plugin;
 
-	private final DataManager dataManager = new DataManager();
 	private final SlotManager slotManager = new SlotManager();
-	private final SQLManager sqlManager = new SQLManager();
 
+	/**
+	 * See {@link InventoryUpdater} for explanation. This is
+	 * the list of all the plugins which require inventory updates.
+	 */
+	private final List<InventoryUpdater> inventoryUpdaters = new ArrayList<>();
+
+	private DataManager dataManager;
 	private ServerVersion version;
 	private VersionWrapper versionWrapper;
 	private ConfigFile language;
 
-	/*
-	 * cached config options
-	 */
+	// Cached config options
 	public int inventorySlots;
 
 	public void onLoad() {
 		plugin = this;
-
-		if (Bukkit.getPluginManager().getPlugin("MMOItems") != null) {
-			slotManager.registerRestriction(MMOItemsTypeRestriction::new, "mmoitemstype", "mmoitemtype", "mitype");
-			slotManager.registerRestriction(MMOItemsLevelRestriction::new, "mmoitemslevel", "mmoitemlevel", "milevel");
-			slotManager.registerRestriction(MMOItemsUniqueRestriction::new, "unique");
-		}
 	}
 
 	public void onEnable() {
 
-		version = new ServerVersion(Bukkit.getServer().getClass());
 		try {
+			version = new ServerVersion(Bukkit.getServer().getClass());
 			getLogger().log(Level.INFO, "Detected Bukkit Version: " + version.toString());
 			versionWrapper = (VersionWrapper) Class.forName("net.Indyuce.inventory.version.wrapper.VersionWrapper_" + version.toString().substring(1))
 					.newInstance();
@@ -80,17 +72,16 @@ public class MMOInventory extends JavaPlugin implements Listener {
 		Bukkit.getServer().getPluginManager().registerEvents(new GuiListener(), this);
 		Bukkit.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
-		sqlManager.setup(getConfig());
-		
+		// MySQL or YAML
+		dataManager = getConfig().getBoolean("mysql.enabled") ? new SQLDataManager() : new YamlDataManager();
+
 		if (getConfig().getBoolean("resource-pack.enabled"))
 			Bukkit.getServer().getPluginManager().registerEvents(new ResourcePack(getConfig().getConfigurationSection("resource-pack")), this);
 
 		if (getConfig().getBoolean("no-custom-inventory")) {
 			dataManager.setInventoryProvider(SimpleInventoryHandler::new);
 			Bukkit.getPluginManager().registerEvents(new NoCustomInventory(), this);
-		}
-
-		else {
+		} else {
 
 			if (getConfig().getBoolean("save-on-leave"))
 				Bukkit.getPluginManager().registerEvents(new SaveOnLeave(), this);
@@ -116,7 +107,6 @@ public class MMOInventory extends JavaPlugin implements Listener {
 
 	public void onDisable() {
 		dataManager.save();
-		sqlManager.close();
 	}
 
 	public void reload() {
@@ -146,13 +136,26 @@ public class MMOInventory extends JavaPlugin implements Listener {
 	public SlotManager getSlotManager() {
 		return slotManager;
 	}
-	
-	public SQLManager getSQLManager() {
-		return sqlManager;
-	}
 
 	public ServerVersion getVersion() {
 		return version;
+	}
+
+	public void registerInventoryUpdater(InventoryUpdater updater) {
+		Validate.notNull(updater, "Updater cannot be null");
+
+		inventoryUpdaters.add(updater);
+	}
+
+	/**
+	 * Iterates through all registered {@link InventoryUpdater} and
+	 * updates the player for every plugin that needs it.
+	 *
+	 * @param player Player which inventory requires an update
+	 */
+	public void updateInventory(Player player) {
+		for (InventoryUpdater updater : inventoryUpdaters)
+			updater.updateInventory(player);
 	}
 
 	public String getTranslation(String path) {

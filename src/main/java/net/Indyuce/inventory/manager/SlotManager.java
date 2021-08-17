@@ -1,5 +1,21 @@
 package net.Indyuce.inventory.manager;
 
+import net.Indyuce.inventory.MMOInventory;
+import net.Indyuce.inventory.util.ConfigFile;
+import net.Indyuce.inventory.util.LineConfig;
+import net.Indyuce.inventory.slot.CustomSlot;
+import net.Indyuce.inventory.slot.SlotRestriction;
+import net.Indyuce.inventory.slot.SlotType;
+import net.Indyuce.inventory.compat.mmoitems.MMOItemsLevelRestriction;
+import net.Indyuce.inventory.compat.mmoitems.MMOItemsTypeRestriction;
+import net.Indyuce.inventory.compat.mmoitems.MMOItemsUniqueRestriction;
+import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.inventory.ItemStack;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,19 +23,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang.Validate;
-import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.inventory.ItemStack;
-
-import net.Indyuce.inventory.MMOInventory;
-import net.Indyuce.inventory.api.ConfigFile;
-import net.Indyuce.inventory.api.LineConfig;
-import net.Indyuce.inventory.api.slot.CustomSlot;
-import net.Indyuce.inventory.api.slot.SlotRestriction;
-import net.Indyuce.inventory.api.slot.SlotType;
 
 public class SlotManager {
 
@@ -40,16 +43,23 @@ public class SlotManager {
 	 */
 	private CustomSlot fill = new CustomSlot("FILL", "", SlotType.FILL, -1, new ItemStack(Material.AIR));
 
+	public SlotManager() {
+
+		if (Bukkit.getPluginManager().getPlugin("MMOItems") != null) {
+			registerRestriction(MMOItemsTypeRestriction::new, "mmoitemstype", "mmoitemtype", "mitype");
+			registerRestriction(config -> new MMOItemsLevelRestriction(), "mmoitemslevel", "mmoitemlevel", "milevel");
+			registerRestriction(MMOItemsUniqueRestriction::new, "unique");
+		}
+	}
+
 	/**
 	 * Registers a custom slot that will appear in /rpginv. Filler items are not
 	 * registered in the map
-	 * 
-	 * @param slot
-	 *            The slot to register
+	 *
+	 * @param slot The slot to register
 	 */
 	public void register(CustomSlot slot) {
-		Validate.isTrue(!slots.containsKey(slot.getIndex()),
-				"Attempted to register two slots (" + slot.getName() + ") with the same inventory index.");
+		Validate.isTrue(!slots.containsKey(slot.getIndex()), "A slot with the same index already exists");
 
 		// only register if not filler
 		if (slot.getType() == SlotType.FILL)
@@ -131,7 +141,6 @@ public class SlotManager {
 				register(new CustomSlot(section));
 			} catch (IllegalArgumentException exception) {
 				MMOInventory.plugin.getLogger().log(Level.WARNING, "Could not load slot " + key + ": " + exception.getMessage());
-				exception.printStackTrace();
 			}
 
 		MMOInventory.plugin.getLogger().log(Level.INFO, "Successfully registered " + slots.size() + " inventory slots.");

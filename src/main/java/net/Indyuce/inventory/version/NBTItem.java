@@ -1,4 +1,4 @@
-package net.Indyuce.inventory.api;
+package net.Indyuce.inventory.version;
 
 import java.util.Arrays;
 import java.util.List;
@@ -7,7 +7,6 @@ import java.util.Set;
 import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.MMOInventory;
-import net.Indyuce.inventory.version.ItemTag;
 
 public abstract class NBTItem {
 	private final ItemStack item;

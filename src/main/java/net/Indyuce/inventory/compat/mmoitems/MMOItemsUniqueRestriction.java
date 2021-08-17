@@ -1,10 +1,10 @@
-package net.Indyuce.inventory.comp;
+package net.Indyuce.inventory.compat.mmoitems;
 
-import net.Indyuce.inventory.api.LineConfig;
-import net.Indyuce.inventory.api.NBTItem;
-import net.Indyuce.inventory.api.inventory.InventoryHandler;
-import net.Indyuce.inventory.api.slot.CustomSlot;
-import net.Indyuce.inventory.api.slot.SlotRestriction;
+import net.Indyuce.inventory.util.LineConfig;
+import net.Indyuce.inventory.version.NBTItem;
+import net.Indyuce.inventory.inventory.InventoryHandler;
+import net.Indyuce.inventory.slot.CustomSlot;
+import net.Indyuce.inventory.slot.SlotRestriction;
 import org.bukkit.inventory.ItemStack;
 
 public class MMOItemsUniqueRestriction extends SlotRestriction {
@@ -16,8 +16,6 @@ public class MMOItemsUniqueRestriction extends SlotRestriction {
      * @param config
      */
     public MMOItemsUniqueRestriction(LineConfig config) {
-        super(config);
-
         config.validate("enabled");
         enabled = config.getBoolean("enabled");
     }

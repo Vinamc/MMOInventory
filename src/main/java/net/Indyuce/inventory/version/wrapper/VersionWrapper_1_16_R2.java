@@ -7,7 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
-import net.Indyuce.inventory.api.NBTItem;
+import net.Indyuce.inventory.version.NBTItem;
 import net.Indyuce.inventory.version.ItemTag;
 import net.minecraft.server.v1_16_R2.NBTTagCompound;
 

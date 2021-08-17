@@ -3,7 +3,7 @@ package net.Indyuce.inventory.version.wrapper;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import net.Indyuce.inventory.api.NBTItem;
+import net.Indyuce.inventory.version.NBTItem;
 
 public interface VersionWrapper {
 	public NBTItem getNBTItem(ItemStack item);

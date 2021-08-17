@@ -1,24 +1,9 @@
-package net.Indyuce.inventory.api.slot;
+package net.Indyuce.inventory.slot;
 
-import net.Indyuce.inventory.api.LineConfig;
-import net.Indyuce.inventory.api.NBTItem;
-import net.Indyuce.inventory.api.inventory.InventoryHandler;
+import net.Indyuce.inventory.version.NBTItem;
+import net.Indyuce.inventory.inventory.InventoryHandler;
 
 public abstract class SlotRestriction {
-	private final LineConfig config;
-
-	/**
-	 * Used to register item application restrictions with stats.
-	 * 
-	 * @param config
-	 */
-	public SlotRestriction(LineConfig config) {
-		this.config = config;
-	}
-
-	public LineConfig getConfig() {
-		return config;
-	}
 
 	/**
 	 * Called when the player tries to equip an item in a specific slot.

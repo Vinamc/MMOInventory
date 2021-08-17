@@ -10,7 +10,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.MMOInventory;
-import net.Indyuce.inventory.api.NBTItem;
+import net.Indyuce.inventory.version.NBTItem;
 import net.Indyuce.inventory.version.ItemTag;
 
 public class VersionWrapper_Reflection implements VersionWrapper {

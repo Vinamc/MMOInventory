@@ -1,6 +1,6 @@
 package net.Indyuce.inventory.version.wrapper;
 
-import net.Indyuce.inventory.api.NBTItem;
+import net.Indyuce.inventory.version.NBTItem;
 import net.Indyuce.inventory.version.ItemTag;
 import net.minecraft.nbt.NBTTagCompound;
 import org.bukkit.Material;

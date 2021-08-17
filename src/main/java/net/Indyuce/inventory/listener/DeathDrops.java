@@ -1,13 +1,12 @@
 package net.Indyuce.inventory.listener;
 
+import net.Indyuce.inventory.MMOInventory;
+import net.Indyuce.inventory.inventory.CustomInventoryHandler;
+import net.Indyuce.inventory.slot.CustomSlot;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
-
-import net.Indyuce.inventory.MMOInventory;
-import net.Indyuce.inventory.api.inventory.CustomInventoryHandler;
-import net.Indyuce.inventory.api.slot.CustomSlot;
 
 public class DeathDrops implements Listener {
 
