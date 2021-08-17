@@ -151,10 +151,14 @@ public class PlayerInventoryView implements InventoryHolder {
 			return;
 		}
 
-		// Check if item can be equipped (apply slot restrictions)
+		// Check for clicked slot
 		CustomSlot slot = MMOInventory.plugin.getSlotManager().get(event.getRawSlot());
+		if (slot == null)
+			return;
+
+		// Check if item can be equipped (apply slot restrictions)
 		NBTItem cursor = NBTItem.get(event.getCursor());
-		if (slot != null && !isAir(event.getCursor())) {
+		if (!isAir(event.getCursor())) {
 
 			// Prevents equipping stacked items
 			if (MMOInventory.plugin.getConfig().getBoolean("disable-equiping-stacked-items", true) && event.getCursor().getAmount() > 1) {
@@ -169,40 +173,37 @@ public class PlayerInventoryView implements InventoryHolder {
 			}
 		}
 
-		if (slot != null) {
-
-			/*
-			 * May be called with a null item as parameter if the player is
-			 * unequipping an item
-			 */
-			ItemEquipEvent.EquipAction action = isAir(event.getCursor()) ? ItemEquipEvent.EquipAction.UNEQUIP : cursor.hasTag("MMOInventoryGuiItem") ? ItemEquipEvent.EquipAction.EQUIP : ItemEquipEvent.EquipAction.SWAP_ITEMS;
-			ItemEquipEvent equipEvent = new ItemEquipEvent(player, event.getCursor(), slot, action);
-			Bukkit.getPluginManager().callEvent(equipEvent);
-			if (equipEvent.isCancelled()) {
-				event.setCancelled(true);
-				return;
-			}
-
-			data.setItem(slot, event.getCursor());
-
-			/*
-			 * If the player has picked up an inventory slot item, remove it
-			 * instantly after checking the equip event was not canceled (bug
-			 * fix)
-			 */
-			if (picked.hasTag("MMOInventoryGuiItem"))
-				event.setCurrentItem(null);
-
-			/*
-			 * If the player is taking away an item without swapping it, place
-			 * the inventory slot item back in the corresponding slot
-			 */
-			if (isAir(event.getCursor()))
-				Bukkit.getScheduler().runTaskLater(MMOInventory.plugin, () -> event.getInventory().setItem(slot.getIndex(), slot.getItem()), 0);
-
-			// Finally update the player's inventory
-			MMOInventory.plugin.updateInventory(player);
+		/*
+		 * May be called with a null item as parameter if the player is
+		 * unequipping an item
+		 */
+		ItemEquipEvent.EquipAction action = isAir(event.getCursor()) ? ItemEquipEvent.EquipAction.UNEQUIP : cursor.hasTag("MMOInventoryGuiItem") ? ItemEquipEvent.EquipAction.EQUIP : ItemEquipEvent.EquipAction.SWAP_ITEMS;
+		ItemEquipEvent equipEvent = new ItemEquipEvent(player, event.getCursor(), slot, action);
+		Bukkit.getPluginManager().callEvent(equipEvent);
+		if (equipEvent.isCancelled()) {
+			event.setCancelled(true);
+			return;
 		}
+
+		data.setItem(slot, event.getCursor());
+
+		/*
+		 * If the player has picked up an inventory slot item, remove it
+		 * instantly after checking the equip event was not canceled (bug
+		 * fix)
+		 */
+		if (picked.hasTag("MMOInventoryGuiItem"))
+			event.setCurrentItem(null);
+
+		/*
+		 * If the player is taking away an item without swapping it, place
+		 * the inventory slot item back in the corresponding slot
+		 */
+		if (isAir(event.getCursor()))
+			Bukkit.getScheduler().runTaskLater(MMOInventory.plugin, () -> event.getInventory().setItem(slot.getIndex(), slot.getItem()), 0);
+
+		// Finally update the player's inventory
+		MMOInventory.plugin.updateInventory(player);
 	}
 
 	/**

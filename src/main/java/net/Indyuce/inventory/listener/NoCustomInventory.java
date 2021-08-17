@@ -2,7 +2,6 @@ package net.Indyuce.inventory.listener;
 
 import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.api.event.ItemEquipEvent;
-import net.Indyuce.inventory.inventory.InventoryHandler;
 import net.Indyuce.inventory.slot.CustomSlot;
 import net.Indyuce.inventory.version.NBTItem;
 import org.bukkit.Bukkit;
@@ -64,7 +63,7 @@ public class NoCustomInventory implements Listener {
 
 		// This only works in the player's inventory
 		Player player = (Player) event.getWhoClicked();
-		if (!event.getClickedInventory().equals(player.getInventory()))
+		if (!player.getInventory().equals(event.getClickedInventory()))
 			return;
 
 		// Find custom slot
@@ -86,10 +85,19 @@ public class NoCustomInventory implements Listener {
 
 		// Check for BOTH custom/vanilla slot restrictions
 		NBTItem cursor = NBTItem.get(event.getCursor());
-		InventoryHandler handler = MMOInventory.plugin.getDataManager().getInventory(player);
-		if (!slot.canHost(handler, cursor)) {
-			event.setCancelled(true);
-			return;
+		if (!isAir(event.getCursor())) {
+
+			// Prevents equipping stacked items
+			if (MMOInventory.plugin.getConfig().getBoolean("disable-equiping-stacked-items", true) && event.getCursor().getAmount() > 1) {
+				event.setCancelled(true);
+				return;
+			}
+
+			// Check for vanilla AND custom slot restrictions
+			if (!slot.canHost(MMOInventory.plugin.getDataManager().getInventory(player), cursor)) {
+				event.setCancelled(true);
+				return;
+			}
 		}
 
 		// Call Bukkit event
