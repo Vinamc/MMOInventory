@@ -6,6 +6,7 @@ import java.util.Set;
 
 import net.minecraft.nbt.NBTTagCompound;
 import org.bukkit.Material;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.MMOInventory;
@@ -16,8 +17,7 @@ public class VersionWrapper_Reflection implements VersionWrapper {
 
     @Override
     public boolean isHelmet(Material material) {
-        return material.name().endsWith("HELMET") || material == Material.CARVED_PUMPKIN || material == Material.PLAYER_HEAD
-                || material == Material.CREEPER_HEAD || material == Material.SKELETON_SKULL || material == Material.WITHER_SKELETON_SKULL;
+        return material.getEquipmentSlot() == EquipmentSlot.HEAD;
     }
 
     @Override

@@ -5,6 +5,7 @@ import net.Indyuce.inventory.version.ItemTag;
 import net.minecraft.nbt.NBTTagCompound;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -14,9 +15,7 @@ public class VersionWrapper_1_17_R1 implements VersionWrapper {
 
     @Override
     public boolean isHelmet(Material material) {
-        return material.name().endsWith("HELMET") || material == Material.CARVED_PUMPKIN
-                || material == Material.PLAYER_HEAD || material == Material.CREEPER_HEAD
-                || material == Material.SKELETON_SKULL || material == Material.WITHER_SKELETON_SKULL;
+        return material.getEquipmentSlot() == EquipmentSlot.HEAD;
     }
 
     @Override
