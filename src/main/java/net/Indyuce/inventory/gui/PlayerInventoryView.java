@@ -199,6 +199,9 @@ public class PlayerInventoryView implements InventoryHolder {
 			 */
 			if (isAir(event.getCursor()))
 				Bukkit.getScheduler().runTaskLater(MMOInventory.plugin, () -> event.getInventory().setItem(slot.getIndex(), slot.getItem()), 0);
+
+			// Finally update the player's inventory
+			MMOInventory.plugin.updateInventory(player);
 		}
 	}
 

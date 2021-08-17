@@ -115,6 +115,9 @@ public class NoCustomInventory implements Listener {
 		 */
 		if (isAir(event.getCursor()))
 			Bukkit.getScheduler().runTask(MMOInventory.plugin, () -> player.getInventory().setItem(slot.getIndex(), slot.getItem()));
+
+		// Finally update the player's inventory
+		MMOInventory.plugin.updateInventory(player);
 	}
 
 	@EventHandler
