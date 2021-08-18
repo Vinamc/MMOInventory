@@ -12,10 +12,10 @@ commands:
 permissions:
     mmoinventory.open:
         description: Allows to open your own inventory using a command.
-        default: false
+        default: op
     mmoinventory.open.other:
         description: Allows to open another player's inventory.
-        default: false
+        default: op
     mmoinventory.admin:
         description: Allows to use admin commands.
-        default: false
+        default: op

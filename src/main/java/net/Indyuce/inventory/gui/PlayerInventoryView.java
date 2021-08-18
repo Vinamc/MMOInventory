@@ -13,10 +13,12 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class PlayerInventoryView implements InventoryHolder {
 	private final CustomInventoryHandler data;
@@ -29,23 +31,26 @@ public class PlayerInventoryView implements InventoryHolder {
 		this(player, player);
 	}
 
+	/**
+	 * @param player Player opening the GUI and manipulating the items
+	 * @param target The player owning the inventory
+	 */
 	public PlayerInventoryView(Player player, Player target) {
 		this.target = target;
 		this.player = player;
 
-		data = (CustomInventoryHandler) MMOInventory.plugin.getDataManager().getInventory(player);
+		data = (CustomInventoryHandler) MMOInventory.plugin.getDataManager().getInventory(target);
 	}
 
 	@Override
 	public Inventory getInventory() {
 		Inventory inv = Bukkit.createInventory(this, MMOInventory.plugin.inventorySlots,
 				target.equals(player) ? MMOInventory.plugin.getTranslation("inventory-name.self")
-						: MMOInventory.plugin.getTranslation("inventory-name.other").replace("{name}", player.getName()));
+						: MMOInventory.plugin.getTranslation("inventory-name.other").replace("{name}", target.getName()));
 
 		// Load custom items or vanilla items depending on slot type
 		for (CustomSlot slot : MMOInventory.plugin.getSlotManager().getLoaded()) {
-			ItemStack item = slot.getType() == SlotType.ACCESSORY ? data.getItem(slot)
-					: slot.getType().getVanillaSlotHandler().retrieveItem(player);
+			ItemStack item = slot.getType() == SlotType.ACCESSORY ? data.getItem(slot) : slot.getType().getVanillaSlotHandler().retrieveItem(target);
 			inv.setItem(slot.getIndex(), isAir(item) ? slot.getItem() : item);
 		}
 
@@ -60,18 +65,10 @@ public class PlayerInventoryView implements InventoryHolder {
 	}
 
 	public void open() {
-		target.openInventory(getInventory());
+		player.openInventory(getInventory());
 	}
 
 	public void whenClicked(InventoryClickEvent event) {
-
-		/*
-		 * The player cannot edit this inventory if it is not theirs
-		 */
-		if (!target.equals(player)) {
-			event.setCancelled(true);
-			return;
-		}
 
 		/*
 		 * Shift clicking finds the ONE slot that can host your item
@@ -99,7 +96,7 @@ public class PlayerInventoryView implements InventoryHolder {
 				if (best == null)
 					return;
 
-				ItemEquipEvent called = new ItemEquipEvent(player, event.getCurrentItem(), best, ItemEquipEvent.EquipAction.SHIFT_CLICK_EQUIP);
+				ItemEquipEvent called = new ItemEquipEvent(target, event.getCurrentItem(), best, ItemEquipEvent.EquipAction.SHIFT_CLICK_EQUIP);
 				Bukkit.getPluginManager().callEvent(called);
 				if (called.isCancelled())
 					return;
@@ -107,6 +104,9 @@ public class PlayerInventoryView implements InventoryHolder {
 				data.setItem(best, picked.getItem());
 				event.getInventory().setItem(best.getIndex(), picked.getItem());
 				event.setCurrentItem(null);
+
+				// For all active watchers
+				forEachWatcher(view -> view.getTopInventory().setItem(best.getIndex(), picked.getItem()));
 
 			} else {
 
@@ -120,7 +120,7 @@ public class PlayerInventoryView implements InventoryHolder {
 				if (empty == -1)
 					return;
 
-				ItemEquipEvent called = new ItemEquipEvent(player, event.getCurrentItem(), null, ItemEquipEvent.EquipAction.SHIFT_CLICK_UNEQUIP);
+				ItemEquipEvent called = new ItemEquipEvent(target, event.getCurrentItem(), null, ItemEquipEvent.EquipAction.SHIFT_CLICK_UNEQUIP);
 				Bukkit.getPluginManager().callEvent(called);
 				if (called.isCancelled())
 					return;
@@ -128,6 +128,9 @@ public class PlayerInventoryView implements InventoryHolder {
 				data.setItem(slot, null);
 				player.getInventory().setItem(empty, event.getCurrentItem());
 				event.setCurrentItem(slot.getItem());
+
+				// For all active watchers
+				forEachWatcher(view -> view.getTopInventory().setItem(slot.getIndex(), slot.getItem()));
 			}
 
 			return;
@@ -178,7 +181,7 @@ public class PlayerInventoryView implements InventoryHolder {
 		 * unequipping an item
 		 */
 		ItemEquipEvent.EquipAction action = isAir(event.getCursor()) ? ItemEquipEvent.EquipAction.UNEQUIP : cursor.hasTag("MMOInventoryGuiItem") ? ItemEquipEvent.EquipAction.EQUIP : ItemEquipEvent.EquipAction.SWAP_ITEMS;
-		ItemEquipEvent equipEvent = new ItemEquipEvent(player, event.getCursor(), slot, action);
+		ItemEquipEvent equipEvent = new ItemEquipEvent(target, event.getCursor(), slot, action);
 		Bukkit.getPluginManager().callEvent(equipEvent);
 		if (equipEvent.isCancelled()) {
 			event.setCancelled(true);
@@ -186,6 +189,10 @@ public class PlayerInventoryView implements InventoryHolder {
 		}
 
 		data.setItem(slot, event.getCursor());
+
+		// For all active watchers
+		ItemStack newItem = isAir(event.getCursor()) ? slot.getItem() : event.getCursor();
+		forEachWatcher(view -> view.getTopInventory().setItem(slot.getIndex(), newItem));
 
 		/*
 		 * If the player has picked up an inventory slot item, remove it
@@ -197,10 +204,13 @@ public class PlayerInventoryView implements InventoryHolder {
 
 		/*
 		 * If the player is taking away an item without swapping it, place
-		 * the inventory slot item back in the corresponding slot
+		 * the inventory slot item back in the corresponding slot.
+		 *
+		 * This must be done using a delayed task otherwise this will replace
+		 * the event's current item
 		 */
 		if (isAir(event.getCursor()))
-			Bukkit.getScheduler().runTaskLater(MMOInventory.plugin, () -> event.getInventory().setItem(slot.getIndex(), slot.getItem()), 0);
+			Bukkit.getScheduler().runTask(MMOInventory.plugin, () -> event.getInventory().setItem(slot.getIndex(), slot.getItem()));
 
 		// Finally update the player's inventory
 		MMOInventory.plugin.updateInventory(player);
@@ -220,6 +230,22 @@ public class PlayerInventoryView implements InventoryHolder {
 				return slot;
 
 		return null;
+	}
+
+	/**
+	 * This is used when an admin edits the inventory of another
+	 * player, while the target player COULD have his inventory opened
+	 * as well.
+	 * <p>
+	 * This method performs
+	 */
+	public void forEachWatcher(Consumer<InventoryView> consumer) {
+		for (Player online : Bukkit.getOnlinePlayers())
+			if (online.getOpenInventory() != null && online.getOpenInventory().getTopInventory().getHolder() instanceof PlayerInventoryView) {
+				PlayerInventoryView customGui = (PlayerInventoryView) online.getOpenInventory().getTopInventory().getHolder();
+				if (!equals(customGui) && customGui.target.equals(target))
+					consumer.accept(online.getOpenInventory());
+			}
 	}
 
 	/**

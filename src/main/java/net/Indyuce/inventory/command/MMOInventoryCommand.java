@@ -1,35 +1,46 @@
 package net.Indyuce.inventory.command;
 
+import net.Indyuce.inventory.MMOInventory;
+import net.Indyuce.inventory.gui.PlayerInventoryView;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import net.Indyuce.inventory.MMOInventory;
-import net.Indyuce.inventory.gui.PlayerInventoryView;
-
 public class MMOInventoryCommand implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if (!(sender instanceof Player)) {
-			sender.sendMessage(MMOInventory.plugin.getTranslation("player-command"));
-			return true;
-		}
 
-		if (args.length < 1 && !(sender instanceof Player)) {
-			sender.sendMessage(MMOInventory.plugin.getTranslation("specify-player"));
-			return true;
-		}
+		// Open own inventory
+		if (args.length < 1 && sender instanceof Player) {
+			if (!sender.hasPermission("mmoinventory.open")) {
+				sender.sendMessage(MMOInventory.plugin.getTranslation("not-enough-perms"));
+				return true;
+			}
 
-		if (args.length < 1) {
 			new PlayerInventoryView((Player) sender).open();
 			return true;
 		}
 
+		if (args.length == 0)
+			return true;
+
+		// Reload command
 		if (args[0].equalsIgnoreCase("reload")) {
+			if (!sender.hasPermission("mmoinventory.admin")) {
+				sender.sendMessage(MMOInventory.plugin.getTranslation("not-enough-perms"));
+				return true;
+			}
+
 			MMOInventory.plugin.reload();
-			sender.sendMessage(MMOInventory.plugin.getTranslation("reload").replace("{name}", MMOInventory.plugin.getName()).replace("{version}", MMOInventory.plugin.getDescription().getVersion()));
+			sender.sendMessage(MMOInventory.plugin.getTranslation("reload").replace("{version}", MMOInventory.plugin.getDescription().getVersion()));
+			return true;
+		}
+
+		// Open inventory of someone else
+		if (!sender.hasPermission("mmoinventory.open.other")) {
+			sender.sendMessage(MMOInventory.plugin.getTranslation("not-enough-perms"));
 			return true;
 		}
 
@@ -39,7 +50,7 @@ public class MMOInventoryCommand implements CommandExecutor {
 			return true;
 		}
 
-		new PlayerInventoryView(target, (Player) sender).open();
+		new PlayerInventoryView((Player) sender, target).open();
 		return true;
 	}
 }

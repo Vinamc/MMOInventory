@@ -4,6 +4,7 @@ import net.Indyuce.inventory.command.MMOInventoryCommand;
 import net.Indyuce.inventory.command.MMOInventoryCompletion;
 import net.Indyuce.inventory.compat.InventoryUpdater;
 import net.Indyuce.inventory.compat.mmoitems.MMOItemsCompatibility;
+import net.Indyuce.inventory.gui.PlayerInventoryView;
 import net.Indyuce.inventory.inventory.SimpleInventoryHandler;
 import net.Indyuce.inventory.listener.*;
 import net.Indyuce.inventory.manager.DataManager;
@@ -19,6 +20,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public class MMOInventory extends JavaPlugin implements Listener {
