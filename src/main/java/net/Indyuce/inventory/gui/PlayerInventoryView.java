@@ -143,6 +143,17 @@ public class PlayerInventoryView implements InventoryHolder {
 		}
 
 		// Prevent any interaction with filler slots
+		// event.getWhoClicked().sendMessage(picked.getString("MMOInventoryGuiItem"));
+
+		List<Integer> allowSlot = Arrays.asList(new Integer[] {
+			1, 10, 19, 28, 4, 12, 13, 22, 31, 7,16, 25, 34
+		});
+
+		if (allowSlot.contains(event.getRawSlot()) == false && event.getRawSlot() == event.getSlot()) {
+			event.setCancelled(true);
+			return;
+		}
+
 		if (picked.getString("MMOInventoryGuiItem").equals("FILL")) {
 			event.setCancelled(true);
 			return;
