@@ -2,6 +2,7 @@ package net.Indyuce.inventory.listener;
 
 import java.util.Iterator;
 
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,6 +12,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import net.Indyuce.inventory.MMOInventory;
@@ -28,12 +30,60 @@ public class InventoryButtonListener implements Listener {
 
 	@EventHandler
 	public void giveItemsOnJoin(PlayerJoinEvent event) {
-		event.getPlayer().getInventory().setItem(slot, icon);
+		if (! setupInventoryIcon(event.getPlayer().getInventory())) {
+			event.getPlayer().sendMessage(MMOInventory.plugin.getTranslation("full-inventory"));
+		}
 	}
-
+	
 	@EventHandler
 	public void giveItemsOnRespawn(PlayerRespawnEvent event) {
-		event.getPlayer().getInventory().setItem(slot, icon);
+		if (! setupInventoryIcon(event.getPlayer().getInventory())) {
+			event.getPlayer().sendMessage(MMOInventory.plugin.getTranslation("full-inventory"));
+		}
+	}
+
+	protected boolean setupInventoryIcon(Inventory inv) {
+
+		// If slot already is icon
+		// then leave it
+		if (isInventoryButton(inv.getItem(slot))) {
+			return true;
+		}
+
+		ItemStack holder = null;
+
+		// Delete old button
+		for (int i = 0; i < inv.getSize(); i++) {
+			ItemStack item = inv.getItem(i);
+
+			if (i == slot || isEmpty(item)) continue;
+
+			if (isInventoryButton(inv.getItem(i))) {
+				inv.clear(i);
+			}
+		}
+
+		// Inventory is full, cant setup
+		if (inv.firstEmpty() == -1) return false;
+
+		if (isEmpty(inv.getItem(slot)) == false && isInventoryButton(inv.getItem(slot)) == false) {
+			holder = inv.getItem(slot);
+			inv.addItem(holder);
+		}
+
+		inv.setItem(slot, icon);
+
+		return true;
+	}
+
+	protected boolean isInventoryButton(ItemStack item) {
+		if (isEmpty(item)) return false;
+
+		return MMOInventory.plugin.getVersionWrapper().getNBTItem(item).getBoolean("MMOInventoryButton");
+	}
+
+	protected boolean isEmpty(ItemStack item) {
+		return item == null || Material.AIR.equals(item.getType());
 	}
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

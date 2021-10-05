@@ -9,6 +9,7 @@ player-command: '&cThis command is only for players.'
 specify-player: '&cPlease specify a player.'
 wrong-player: '&cCould not find the player called {arg}.'
 not-enough-perms: '&cYou don''t have enough permissions'
+full-inventory: '&cMake sure you have one slot empty before get &b"Iventory-Item"'
 
 # Command Output
 reload: '&eMMOInventory {version} successfully reloaded.'
