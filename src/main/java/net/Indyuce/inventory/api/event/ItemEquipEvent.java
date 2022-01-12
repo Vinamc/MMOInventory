@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 public class ItemEquipEvent extends PlayerEvent implements Cancellable {
 	private static final HandlerList handlers = new HandlerList();
 
+	@Nullable
 	private final ItemStack item;
 	private final CustomSlot slot;
 	private final EquipAction action;

@@ -5,6 +5,7 @@ import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.api.event.ItemEquipEvent;
 import net.Indyuce.inventory.compat.InventoryUpdater;
 import net.Indyuce.inventory.gui.PlayerInventoryView;
+import net.Indyuce.inventory.inventory.InventoryLookupMode;
 import net.Indyuce.mmoitems.MMOItems;
 import net.Indyuce.mmoitems.api.player.PlayerData;
 import net.Indyuce.mmoitems.api.player.inventory.EquippedItem;
@@ -36,7 +37,7 @@ public class MMOItemsCompatibility implements PlayerInventory, Listener, Invento
 	public List<EquippedItem> getInventory(Player player) {
 		List<EquippedItem> list = new ArrayList<>();
 		
-		MMOInventory.plugin.getDataManager().getInventory(player).getExtraItems().forEach(item -> list.add(new EquippedItem(item, EquipmentSlot.ACCESSORY)));
+		MMOInventory.plugin.getDataManager().getInventory(player).getItems(InventoryLookupMode.NORMAL).forEach(item -> list.add(new EquippedItem(item.getItemStack(), EquipmentSlot.ACCESSORY)));
 
 		return list;
 	}

@@ -1,7 +1,7 @@
 package net.Indyuce.inventory.slot;
 
-import net.Indyuce.inventory.version.NBTItem;
 import net.Indyuce.inventory.inventory.InventoryHandler;
+import org.bukkit.inventory.ItemStack;
 
 public abstract class SlotRestriction {
 
@@ -13,5 +13,5 @@ public abstract class SlotRestriction {
 	 * @param item     The item being equipped
 	 * @return If the item can be equipped in that custom slot
 	 */
-	public abstract boolean isVerified(InventoryHandler provider, CustomSlot slot, NBTItem item);
+	public abstract boolean isVerified(InventoryHandler provider, CustomSlot slot, ItemStack item);
 }
