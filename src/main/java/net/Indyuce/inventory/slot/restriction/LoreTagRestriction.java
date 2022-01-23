@@ -3,6 +3,7 @@ package net.Indyuce.inventory.slot.restriction;
 import net.Indyuce.inventory.inventory.InventoryHandler;
 import net.Indyuce.inventory.slot.CustomSlot;
 import net.Indyuce.inventory.util.LineConfig;
+import net.Indyuce.inventory.util.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -19,11 +20,13 @@ import org.bukkit.inventory.meta.ItemMeta;
  * for that tag in the item lore.
  */
 public class LoreTagRestriction extends SlotRestriction {
-    private final String loreLine;
+    private final String loreTag;
+    private final CheckType checkType;
 
     public LoreTagRestriction(LineConfig config) {
-        config.validate("line");
-        loreLine = ChatColor.translateAlternateColorCodes('&', config.getString("line"));
+        config.validate("tag");
+        loreTag = ChatColor.translateAlternateColorCodes('&', config.getString("tag"));
+        checkType = config.contains("check") ? CheckType.EQUALS : CheckType.valueOf(Utils.enumName(config.getString("check")));
     }
 
     @Override
@@ -36,9 +39,27 @@ public class LoreTagRestriction extends SlotRestriction {
             return false;
 
         for (String checked : meta.getLore())
-            if (checked.equals(loreLine))
+            if (checkType.operation.check(checked, loreTag))
                 return true;
 
         return false;
+    }
+
+    enum CheckType {
+        EQUALS(String::equals),
+        CONTAINS(String::contains),
+        STARTS_WITH(String::startsWith),
+        ENDS_WITH(String::endsWith);
+
+        final Operation operation;
+
+        CheckType(Operation operation) {
+            this.operation = operation;
+        }
+    }
+
+    @FunctionalInterface
+    interface Operation {
+        boolean check(String container, String pattern);
     }
 }
