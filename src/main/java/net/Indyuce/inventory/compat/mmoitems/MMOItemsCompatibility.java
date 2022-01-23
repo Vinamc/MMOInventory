@@ -27,7 +27,7 @@ public class MMOItemsCompatibility implements PlayerInventory, Listener, Invento
 		MMOInventory.plugin.registerInventoryUpdater(this);
 
 		/*
-		 * register with delay because MMOInventory does
+		 * Register with delay because MMOInventory does
 		 * not always enable after MMOItems
 		 */
 		Bukkit.getScheduler().runTask(MMOInventory.plugin, () -> MMOItems.plugin.registerPlayerInventory(this));
@@ -43,13 +43,13 @@ public class MMOItemsCompatibility implements PlayerInventory, Listener, Invento
 	}
 
 	@EventHandler
-	public void a(InventoryCloseEvent event) {
+	public void updateWhenClosing(InventoryCloseEvent event) {
 		if (event.getInventory().getHolder() != null && event.getInventory().getHolder() instanceof PlayerInventoryView)
 			PlayerData.get((OfflinePlayer) event.getPlayer()).updateInventory();
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void b(ItemEquipEvent event) {
+	public void updateWhenEquippingItem(ItemEquipEvent event) {
 		Bukkit.getScheduler().runTaskLater(MMOInventory.plugin, () -> PlayerData.get(event.getPlayer()).updateInventory(), 0);
 	}
 

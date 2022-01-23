@@ -2,8 +2,10 @@ package net.Indyuce.inventory.manager;
 
 import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.slot.CustomSlot;
-import net.Indyuce.inventory.slot.SlotRestriction;
 import net.Indyuce.inventory.slot.SlotType;
+import net.Indyuce.inventory.slot.restriction.ClassRestriction;
+import net.Indyuce.inventory.slot.restriction.LevelRestriction;
+import net.Indyuce.inventory.slot.restriction.SlotRestriction;
 import net.Indyuce.inventory.util.ConfigFile;
 import net.Indyuce.inventory.util.LineConfig;
 import org.apache.commons.lang.Validate;
@@ -37,9 +39,16 @@ public class SlotManager {
      * map but instead cached in this field to both have easier access AND make
      * them not interfere with other systems as they aren't real slots
      */
-    private CustomSlot fill = new CustomSlot("FILL", "", SlotType.FILL, -1, new ItemStack(Material.AIR));
+    private CustomSlot fill = new CustomSlot("FILL", SlotType.FILL, -1, new ItemStack(Material.AIR));
 
     private boolean registration = true;
+
+    public SlotManager() {
+
+        // Default slot restrictions
+        registerRestriction(LevelRestriction::new, "level");
+        registerRestriction(ClassRestriction::new, "class", "classes");
+    }
 
     /**
      * Registers a custom slot that will appear in /rpginv. Filler items are not
@@ -55,10 +64,6 @@ public class SlotManager {
             fill = slot;
         else
             slots.put(slot.getIndex(), slot);
-    }
-
-    public void unregister(int index) {
-        slots.remove(index);
     }
 
     /**
@@ -102,7 +107,7 @@ public class SlotManager {
      */
     public void registerRestriction(Function<LineConfig, SlotRestriction> function, String... ids) {
         Validate.isTrue(registration, "Slot restriction registration is disabled");
-        Validate.notNull(function, "Function must not be null.");
+        Validate.notNull(function, "Function cannot not be null");
 
         for (String id : ids) {
             id = id.toLowerCase().replace("-", "_").replace(" ", "_");

@@ -5,11 +5,11 @@ import net.Indyuce.inventory.inventory.InventoryHandler;
 import net.Indyuce.inventory.inventory.InventoryItem;
 import net.Indyuce.inventory.inventory.InventoryLookupMode;
 import net.Indyuce.inventory.slot.CustomSlot;
-import net.Indyuce.inventory.slot.SlotRestriction;
+import net.Indyuce.inventory.slot.restriction.SlotRestriction;
 import net.Indyuce.inventory.util.LineConfig;
 import org.bukkit.inventory.ItemStack;
 
-public class MMOItemsUniqueRestriction extends SlotRestriction {
+public class UniqueRestriction extends SlotRestriction {
     private final boolean enabled;
 
     /**
@@ -17,7 +17,7 @@ public class MMOItemsUniqueRestriction extends SlotRestriction {
      *
      * @param config
      */
-    public MMOItemsUniqueRestriction(LineConfig config) {
+    public UniqueRestriction(LineConfig config) {
         config.validate("enabled");
         enabled = config.getBoolean("enabled");
     }

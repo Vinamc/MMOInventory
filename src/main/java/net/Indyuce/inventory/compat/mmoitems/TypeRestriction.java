@@ -4,11 +4,11 @@ import io.lumine.mythic.lib.api.item.NBTItem;
 import net.Indyuce.inventory.util.LineConfig;
 import net.Indyuce.inventory.inventory.InventoryHandler;
 import net.Indyuce.inventory.slot.CustomSlot;
-import net.Indyuce.inventory.slot.SlotRestriction;
+import net.Indyuce.inventory.slot.restriction.SlotRestriction;
 import net.Indyuce.mmoitems.api.Type;
 import org.bukkit.inventory.ItemStack;
 
-public class MMOItemsTypeRestriction extends SlotRestriction {
+public class TypeRestriction extends SlotRestriction {
 
 	/**
 	 * Forced to save the MMOItems type as a string and not a type instance
@@ -17,7 +17,7 @@ public class MMOItemsTypeRestriction extends SlotRestriction {
 	 */
 	private final String id;
 
-	public MMOItemsTypeRestriction(LineConfig config) {
+	public TypeRestriction(LineConfig config) {
 		config.validate("type");
 
 		id = config.getString("type").toUpperCase().replace("-", "_").replace(" ", "_");
