@@ -2,11 +2,13 @@ package net.Indyuce.inventory;
 
 import net.Indyuce.inventory.command.MMOInventoryCommand;
 import net.Indyuce.inventory.command.MMOInventoryCompletion;
+import net.Indyuce.inventory.compat.ClassModule;
 import net.Indyuce.inventory.compat.InventoryUpdater;
+import net.Indyuce.inventory.compat.LevelModule;
 import net.Indyuce.inventory.compat.mmoitems.MMOItemsCompatibility;
-import net.Indyuce.inventory.compat.mmoitems.MMOItemsLevelRestriction;
-import net.Indyuce.inventory.compat.mmoitems.MMOItemsTypeRestriction;
-import net.Indyuce.inventory.compat.mmoitems.MMOItemsUniqueRestriction;
+import net.Indyuce.inventory.compat.mmoitems.UseRestriction;
+import net.Indyuce.inventory.compat.mmoitems.TypeRestriction;
+import net.Indyuce.inventory.compat.mmoitems.UniqueRestriction;
 import net.Indyuce.inventory.inventory.SimpleInventoryHandler;
 import net.Indyuce.inventory.listener.*;
 import net.Indyuce.inventory.manager.DataManager;
@@ -16,7 +18,7 @@ import net.Indyuce.inventory.manager.sql.SQLDataManager;
 import net.Indyuce.inventory.util.ConfigFile;
 import net.Indyuce.inventory.version.ServerVersion;
 import net.Indyuce.inventory.version.wrapper.VersionWrapper;
-import net.Indyuce.inventory.version.wrapper.VersionWrapper_Reflection;
+import net.Indyuce.inventory.version.wrapper.VersionWrapper_Recent;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -42,6 +44,8 @@ public class MMOInventory extends JavaPlugin implements Listener {
      */
     private final List<InventoryUpdater> inventoryUpdaters = new ArrayList<>();
 
+    private LevelModule levelModule;
+    private ClassModule classModule;
     private DataManager dataManager;
     private ServerVersion version;
     private VersionWrapper versionWrapper;
@@ -54,9 +58,9 @@ public class MMOInventory extends JavaPlugin implements Listener {
         plugin = this;
 
         if (Bukkit.getPluginManager().getPlugin("MMOItems") != null) {
-            slotManager.registerRestriction(MMOItemsTypeRestriction::new, "mmoitemstype", "mmoitemtype", "mitype");
-            slotManager.registerRestriction(config -> new MMOItemsLevelRestriction(), "mmoitemslevel", "mmoitemlevel", "milevel");
-            slotManager.registerRestriction(MMOItemsUniqueRestriction::new, "unique");
+            slotManager.registerRestriction(TypeRestriction::new, "mmoitemstype", "mmoitemtype", "mitype");
+            slotManager.registerRestriction(config -> new UseRestriction(), "mmoitemslevel", "mmoitemlevel", "milevel");
+            slotManager.registerRestriction(UniqueRestriction::new, "unique");
         }
     }
 
@@ -65,11 +69,9 @@ public class MMOInventory extends JavaPlugin implements Listener {
         try {
             version = new ServerVersion(Bukkit.getServer().getClass());
             getLogger().log(Level.INFO, "Detected Bukkit Version: " + version.toString());
-            versionWrapper = (VersionWrapper) Class.forName("net.Indyuce.inventory.version.wrapper.VersionWrapper_" + version.toString().substring(1))
-                    .newInstance();
+            versionWrapper = (VersionWrapper) Class.forName("net.Indyuce.inventory.version.wrapper.VersionWrapper_" + version.toString().substring(1)).getDeclaredConstructor().newInstance();
         } catch (Exception e) {
-            getLogger().log(Level.INFO, "Your server version is handled via reflection");
-            versionWrapper = new VersionWrapper_Reflection();
+            versionWrapper = new VersionWrapper_Recent();
         }
 
         saveDefaultConfig();
@@ -148,6 +150,14 @@ public class MMOInventory extends JavaPlugin implements Listener {
 
     public ServerVersion getVersion() {
         return version;
+    }
+
+    public LevelModule getLevelModule() {
+        return levelModule;
+    }
+
+    public ClassModule getClassModule() {
+        return classModule;
     }
 
     public void registerInventoryUpdater(InventoryUpdater updater) {
