@@ -4,9 +4,9 @@ import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.slot.CustomSlot;
 import net.Indyuce.inventory.slot.SlotType;
 import net.Indyuce.inventory.util.Utils;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -68,12 +68,15 @@ public class CustomInventoryHandler extends InventoryHandler {
 	 * @param slot Custom slot to check
 	 * @return The item equipped by the player
 	 */
+	@Nullable
 	public ItemStack getItem(CustomSlot slot) {
 		return slot.getType().isCustom() ? getItem(slot.getIndex()) : slot.getType().getVanillaSlotHandler().retrieveItem(player);
 	}
 
+	@Nullable
 	public ItemStack getItem(int slot) {
-		return items.get(slot).getItemStack();
+		InventoryItem invItem = items.get(slot);
+		return invItem == null ? null : invItem.getItemStack();
 	}
 
 	/**
