@@ -2,7 +2,9 @@ package net.Indyuce.inventory.slot;
 
 import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.inventory.InventoryHandler;
+import net.Indyuce.inventory.slot.restriction.SlotRestriction;
 import net.Indyuce.inventory.util.LineConfig;
+import net.Indyuce.inventory.util.Utils;
 import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -15,9 +17,10 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CustomSlot {
-    private final String id, name;
+    private final String id;
     private final SlotType type;
     private final int slot;
     private final ItemStack item;
@@ -38,10 +41,25 @@ public class CustomSlot {
      * @param slot The GUI slot that will be used to display the current item in
      *             /rpginv
      * @param item The itemstack used to indicate the custom slot in the GUI
+     * @deprecated Parameter <code>name</code> is useless
      */
+    @Deprecated
     public CustomSlot(String id, String name, SlotType type, int slot, ItemStack item) {
+        this(id, type, slot, item);
+    }
+
+    /**
+     * Used to register custom RPG inventory slots from other plugins
+     *
+     * @param id   The custom slot id (CHESTPLATE)
+     * @param type The slot type, use the corresponding type for vanilla slots,
+     *             ACCESSORY for custom RPG slots, or FILL for filler items
+     * @param slot The GUI slot that will be used to display the current item in
+     *             /rpginv
+     * @param item The itemstack used to indicate the custom slot in the GUI
+     */
+    public CustomSlot(String id, SlotType type, int slot, ItemStack item) {
         this.id = id;
-        this.name = name;
         this.type = type;
         this.item = item;
 
@@ -57,18 +75,15 @@ public class CustomSlot {
         type = SlotType.valueOf(config.getString("type").toUpperCase().replace("-", "_").replace(" ", "_"));
         slot = type == SlotType.FILL ? -1 : config.getInt("slot");
 
-        // cache slot item
-        Validate.notNull(name = config.getString("name"), "Could not read slot name");
-        Validate.notNull(config.getStringList("lore"), "Could not read slot lore");
-        Validate.notNull(config.getString("material"), "Could not read material");
+        // Cache slot item
         int model = config.contains("durability") ? config.getInt("durability") : config.getInt("custom-model-data");
-        this.item = new ItemStack(Material.valueOf(config.getString("material").toUpperCase().replace("-", "_").replace(" ", "_")));
+        this.item = new ItemStack(Material.valueOf(Utils.enumName(Objects.requireNonNull(config.getString("material"), "Could not read slot material"))));
         ItemMeta meta = item.getItemMeta();
         meta.setCustomModelData(model);
-        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', Objects.requireNonNull(config.getString("name"), "Could not read slot name")));
         meta.addItemFlags(ItemFlag.values());
         List<String> lore = new ArrayList<>();
-        for (String line : config.getStringList("lore"))
+        for (String line : Objects.requireNonNull(config.getStringList("lore"), "Could not read slot lore"))
             lore.add(ChatColor.GRAY + ChatColor.translateAlternateColorCodes('&', line));
         meta.setLore(lore);
         meta.setUnbreakable(true);
@@ -83,10 +98,6 @@ public class CustomSlot {
 
     public String getId() {
         return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public int getIndex() {
@@ -105,8 +116,8 @@ public class CustomSlot {
      * @param player Data of the player equipping the item
      * @param item   The item being equipped in the slot
      * @return If the item can be equipped in that slot. This only checks for
-     * custom restrictions and NOT for vanilla slot based restrictions.
-     * See {@link #canHost(InventoryHandler, ItemStack)}
+     *         custom restrictions and NOT for vanilla slot based restrictions.
+     *         See {@link #canHost(InventoryHandler, ItemStack)}
      */
     public boolean checkSlotRestrictions(InventoryHandler player, ItemStack item) {
         for (SlotRestriction restriction : restrictions)
@@ -123,7 +134,7 @@ public class CustomSlot {
      * @param player Data of the player equipping the item
      * @param item   The item being equipped in the slot
      * @return If the item can be equipped in that slot. This checks for
-     * both custom AND vanilla slot restrictions
+     *         both custom AND vanilla slot restrictions
      */
     public boolean canHost(InventoryHandler player, ItemStack item) {
         return getType().isCustom() ? checkSlotRestrictions(player, item) : getType().getVanillaSlotHandler().canEquip(item);

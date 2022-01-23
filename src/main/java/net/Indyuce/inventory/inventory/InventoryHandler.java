@@ -16,9 +16,11 @@ public abstract class InventoryHandler {
     @Nullable
     protected Player player;
 
+    private long lastLogActivity;
+
     public InventoryHandler(Player player) {
-        this.player = player;
         this.uuid = player.getUniqueId();
+        updatePlayer(player);
     }
 
     public UUID getUniqueId() {
@@ -32,6 +34,7 @@ public abstract class InventoryHandler {
 
     public void updatePlayer(@Nullable Player player) {
         this.player = player;
+        this.lastLogActivity = System.currentTimeMillis();
     }
 
     /**
@@ -49,8 +52,8 @@ public abstract class InventoryHandler {
 
     /**
      * @return A collection of all the extra items (vanilla slots put aside) ie
-     * accessories placed in custom RPG slots. This should include all items even
-     * the ones not usable by the player.
+     *         accessories placed in custom RPG slots. This should include all items even
+     *         the ones not usable by the player.
      */
     protected abstract Collection<InventoryItem> retrieveItems();
 }

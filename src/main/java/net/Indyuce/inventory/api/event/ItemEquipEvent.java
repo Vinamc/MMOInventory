@@ -20,8 +20,8 @@ public class ItemEquipEvent extends PlayerEvent implements Cancellable {
 	private boolean cancelled = false;
 
 	/**
-	 * Event called whenever a player equips an item in a custom or vanilla slot
-	 * when he has the custom inventory opened
+	 * Event called whenever a player equips an item in a custom or
+	 * vanilla slot when he has the custom inventory opened
 	 *
 	 * @param player Playing equipping the item
 	 * @param item   Item being equipped in a custom slot, or null if the player is
