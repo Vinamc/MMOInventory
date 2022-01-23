@@ -93,7 +93,7 @@ public class MMOInventory extends JavaPlugin implements Listener {
         try {
             String moduleName = getConfig().getString("class-module");
             ModuleType moduleType = ModuleType.valueOf(Utils.enumName(moduleName));
-            Validate.notNull(moduleType.findPlugin(), "Plugin '" + moduleType.name() + "'not installed");
+            Validate.isTrue(moduleType.findPlugin(), "Plugin '" + moduleType.name() + "'not installed");
             Object module = moduleType.getModule();
             Validate.isTrue(module instanceof ClassModule, "Plugin '" + moduleType.name() + "' does not support classes");
             this.classModule = (ClassModule) module;
@@ -106,7 +106,7 @@ public class MMOInventory extends JavaPlugin implements Listener {
         try {
             String moduleName = getConfig().getString("level-module");
             ModuleType moduleType = ModuleType.valueOf(Utils.enumName(moduleName));
-            Validate.notNull(moduleType.findPlugin(), "Plugin '" + moduleType.name() + "'not installed");
+            Validate.isTrue(moduleType.findPlugin(), "Plugin '" + moduleType.name() + "'not installed");
             Object module = moduleType.getModule();
             Validate.isTrue(module instanceof LevelModule, "Plugin '" + moduleType.name() + "' does not support levels");
             this.levelModule = (LevelModule) module;

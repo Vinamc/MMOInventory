@@ -2,13 +2,13 @@ package net.Indyuce.inventory.compat;
 
 import net.Indyuce.inventory.compat.list.*;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
 
 import javax.inject.Provider;
 
 public enum ModuleType {
     AURELIUMSKILLS("AureliumSkills", AureliumSkillsHook::new),
     BATTLELEVELS("BattleLevels", BattleLevelsHook::new),
+    DEFAULT(null, DefaultHook::new),
     HEROES("Heroes", HeroesHook::new),
     MCMMO("mcMMO", McMMOHook::new),
     MCRPG("McRPG", McRPGHook::new),
@@ -33,7 +33,7 @@ public enum ModuleType {
         return moduleProvider.get();
     }
 
-    public Plugin findPlugin() {
-        return Bukkit.getPluginManager().getPlugin(pluginName);
+    public boolean findPlugin() {
+        return pluginName == null || Bukkit.getPluginManager().getPlugin(pluginName) != null;
     }
 }
