@@ -139,4 +139,17 @@ public class CustomSlot {
     public boolean canHost(InventoryHandler player, ItemStack item) {
         return getType().isCustom() ? checkSlotRestrictions(player, item) : getType().getVanillaSlotHandler().canEquip(item);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CustomSlot that = (CustomSlot) o;
+        return slot == that.slot;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(slot);
+    }
 }

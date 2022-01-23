@@ -1,6 +1,7 @@
 package net.Indyuce.inventory.manager;
 
 import net.Indyuce.inventory.MMOInventory;
+import net.Indyuce.inventory.slot.restriction.LoreTagRestriction;
 import net.Indyuce.inventory.slot.CustomSlot;
 import net.Indyuce.inventory.slot.SlotType;
 import net.Indyuce.inventory.slot.restriction.ClassRestriction;
@@ -50,6 +51,7 @@ public class SlotManager {
         registerRestriction(LevelRestriction::new, "level");
         registerRestriction(ClassRestriction::new, "class", "classes");
         registerRestriction(PermissionRestriction::new, "permission", "perm", "permissionnode", "permnode");
+        registerRestriction(LoreTagRestriction::new, "lartype", "loretag", "customtag");
     }
 
     /**
