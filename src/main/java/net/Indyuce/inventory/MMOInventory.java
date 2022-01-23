@@ -27,7 +27,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.java.JavaPlugin;
+import ru.endlesscode.rpginventory.RPGInventory;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-public class MMOInventory extends JavaPlugin implements Listener {
+public class MMOInventory extends RPGInventory implements Listener {
     public static MMOInventory plugin;
 
     private final SlotManager slotManager = new SlotManager();

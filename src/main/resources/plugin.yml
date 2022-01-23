@@ -1,4 +1,4 @@
-name: MMOInventory
+name: RPGInventory
 version: ${project.version}
 main: net.Indyuce.inventory.MMOInventory
 author: Indyuce
