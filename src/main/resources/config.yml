@@ -40,6 +40,7 @@ drop-on-death: true
 # - mcmmo (level only)
 # - mcrpg (level only)
 # - mmocore
+# - proskillapi
 # - racesandclasses
 # - rpgplayerleveling (level only)
 # - skillapi
