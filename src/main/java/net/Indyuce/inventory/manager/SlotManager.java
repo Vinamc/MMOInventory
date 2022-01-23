@@ -5,6 +5,7 @@ import net.Indyuce.inventory.slot.CustomSlot;
 import net.Indyuce.inventory.slot.SlotType;
 import net.Indyuce.inventory.slot.restriction.ClassRestriction;
 import net.Indyuce.inventory.slot.restriction.LevelRestriction;
+import net.Indyuce.inventory.slot.restriction.PermissionRestriction;
 import net.Indyuce.inventory.slot.restriction.SlotRestriction;
 import net.Indyuce.inventory.util.ConfigFile;
 import net.Indyuce.inventory.util.LineConfig;
@@ -48,6 +49,7 @@ public class SlotManager {
         // Default slot restrictions
         registerRestriction(LevelRestriction::new, "level");
         registerRestriction(ClassRestriction::new, "class", "classes");
+        registerRestriction(PermissionRestriction::new, "permission", "perm", "permissionnode", "permnode");
     }
 
     /**
