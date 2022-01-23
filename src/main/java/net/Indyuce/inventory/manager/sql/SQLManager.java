@@ -10,8 +10,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 public class SQLManager extends MMODataSource {

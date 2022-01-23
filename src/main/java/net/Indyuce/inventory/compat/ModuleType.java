@@ -33,7 +33,7 @@ public enum ModuleType {
         return moduleProvider.get();
     }
 
-    public Plugin getPluginName() {
+    public Plugin findPlugin() {
         return Bukkit.getPluginManager().getPlugin(pluginName);
     }
 }

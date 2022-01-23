@@ -5,10 +5,12 @@ import net.Indyuce.inventory.command.MMOInventoryCompletion;
 import net.Indyuce.inventory.compat.ClassModule;
 import net.Indyuce.inventory.compat.InventoryUpdater;
 import net.Indyuce.inventory.compat.LevelModule;
+import net.Indyuce.inventory.compat.ModuleType;
+import net.Indyuce.inventory.compat.list.DefaultHook;
 import net.Indyuce.inventory.compat.mmoitems.MMOItemsCompatibility;
-import net.Indyuce.inventory.compat.mmoitems.UseRestriction;
 import net.Indyuce.inventory.compat.mmoitems.TypeRestriction;
 import net.Indyuce.inventory.compat.mmoitems.UniqueRestriction;
+import net.Indyuce.inventory.compat.mmoitems.UseRestriction;
 import net.Indyuce.inventory.inventory.SimpleInventoryHandler;
 import net.Indyuce.inventory.listener.*;
 import net.Indyuce.inventory.manager.DataManager;
@@ -16,6 +18,7 @@ import net.Indyuce.inventory.manager.SlotManager;
 import net.Indyuce.inventory.manager.YamlDataManager;
 import net.Indyuce.inventory.manager.sql.SQLDataManager;
 import net.Indyuce.inventory.util.ConfigFile;
+import net.Indyuce.inventory.util.Utils;
 import net.Indyuce.inventory.version.ServerVersion;
 import net.Indyuce.inventory.version.wrapper.VersionWrapper;
 import net.Indyuce.inventory.version.wrapper.VersionWrapper_Recent;
@@ -85,6 +88,32 @@ public class MMOInventory extends JavaPlugin implements Listener {
 
         // MySQL or YAML
         dataManager = getConfig().getBoolean("mysql.enabled") ? new SQLDataManager() : new YamlDataManager();
+
+        // Load class module
+        try {
+            String moduleName = getConfig().getString("class-module");
+            ModuleType moduleType = ModuleType.valueOf(Utils.enumName(moduleName));
+            Validate.notNull(moduleType.findPlugin(), "Plugin '" + moduleType.name() + "'not installed");
+            Object module = moduleType.getModule();
+            Validate.isTrue(module instanceof ClassModule, "Plugin '" + moduleType.name() + "' does not support classes");
+            this.classModule = (ClassModule) module;
+        } catch (Exception exception) {
+            getLogger().log(Level.WARNING, "Could not initialize custom class module: " + exception.getMessage());
+            this.classModule = new DefaultHook();
+        }
+
+        // Load level module
+        try {
+            String moduleName = getConfig().getString("level-module");
+            ModuleType moduleType = ModuleType.valueOf(Utils.enumName(moduleName));
+            Validate.notNull(moduleType.findPlugin(), "Plugin '" + moduleType.name() + "'not installed");
+            Object module = moduleType.getModule();
+            Validate.isTrue(module instanceof LevelModule, "Plugin '" + moduleType.name() + "' does not support levels");
+            this.levelModule = (LevelModule) module;
+        } catch (Exception exception) {
+            getLogger().log(Level.WARNING, "Could not initialize custom level module: " + exception.getMessage());
+            this.levelModule = new DefaultHook();
+        }
 
         if (getConfig().getBoolean("resource-pack.enabled"))
             Bukkit.getServer().getPluginManager().registerEvents(new ResourcePack(getConfig().getConfigurationSection("resource-pack")), this);

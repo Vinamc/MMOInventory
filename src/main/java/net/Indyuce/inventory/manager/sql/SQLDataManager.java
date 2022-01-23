@@ -6,6 +6,8 @@ import net.Indyuce.inventory.inventory.InventoryHandler;
 import net.Indyuce.inventory.inventory.InventoryLookupMode;
 import net.Indyuce.inventory.manager.DataManager;
 import net.Indyuce.inventory.slot.CustomSlot;
+import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
@@ -14,6 +16,7 @@ public class SQLDataManager extends DataManager {
     private final SQLManager sqlManager = new SQLManager();
 
     public SQLDataManager() {
+        Validate.isTrue(Bukkit.getPluginManager().getPlugin("MythicLib") != null, "MythicLib is required for SQL data storage");
         sqlManager.setup(MMOInventory.plugin.getConfig());
     }
 
