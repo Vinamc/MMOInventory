@@ -8,5 +8,5 @@ import org.bukkit.Material;
  * with spigot builds from 1.12 to 1.13
  */
 public interface VersionWrapper {
-    public boolean isHelmet(Material material);
+    boolean isHelmet(Material material);
 }

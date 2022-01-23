@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 public class MMOInventoryCommand implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-
 		// Open own inventory
 		if (args.length < 1 && sender instanceof Player) {
 			if (!sender.hasPermission("mmoinventory.open")) {
