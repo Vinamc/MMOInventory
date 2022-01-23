@@ -26,7 +26,7 @@ public class LoreTagRestriction extends SlotRestriction {
     public LoreTagRestriction(LineConfig config) {
         config.validate("tag");
         loreTag = ChatColor.translateAlternateColorCodes('&', config.getString("tag"));
-        checkType = config.contains("check") ? CheckType.EQUALS : CheckType.valueOf(Utils.enumName(config.getString("check")));
+        checkType = config.contains("check") ? CheckType.valueOf(Utils.enumName(config.getString("check"))) : CheckType.EQUALS;
     }
 
     @Override
