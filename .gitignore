@@ -2,3 +2,8 @@
 /target/
 .idea/
 mmoinventory.iml
+.settings
+.classpath
+.factorypath
+.vscode
+.project

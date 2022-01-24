@@ -7,8 +7,6 @@ import net.Indyuce.inventory.slot.CustomSlot;
 import net.Indyuce.inventory.slot.SlotType;
 import net.Indyuce.inventory.util.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -16,7 +14,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -145,6 +142,17 @@ public class PlayerInventoryView implements InventoryHolder {
         }
 
         // Prevent any interaction with filler slots
+        // event.getWhoClicked().sendMessage(picked.getString("MMOInventoryGuiItem"));
+
+        List<Integer> allowSlot = Arrays.asList(new Integer[] {
+            1, 10, 19, 28, 4, 12, 13, 22, 31, 7,16, 25, 34
+        });
+
+        if (allowSlot.contains(event.getRawSlot()) == false && event.getRawSlot() == event.getSlot()) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (Utils.isGuiItem(picked) && Utils.getGuiItemId(picked).equals("fill")) {
             event.setCancelled(true);
             return;
