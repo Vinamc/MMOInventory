@@ -1,5 +1,9 @@
 package net.Indyuce.inventory.listener;
 
+import net.Indyuce.inventory.MMOInventory;
+import net.Indyuce.inventory.gui.PlayerInventoryView;
+import net.Indyuce.inventory.util.InventoryButton;
+import net.Indyuce.inventory.util.Utils;
 import java.util.Iterator;
 
 import org.bukkit.Material;
@@ -15,92 +19,88 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import net.Indyuce.inventory.MMOInventory;
-import net.Indyuce.inventory.util.InventoryButton;
-import net.Indyuce.inventory.gui.PlayerInventoryView;
-
 public class InventoryButtonListener implements Listener {
-	private final ItemStack icon;
-	private final int slot;
+    private final ItemStack icon;
+    private final int slot;
 
-	public InventoryButtonListener(ConfigurationSection config) {
-		slot = config.getInt("slot");
-		icon = new InventoryButton(config.getConfigurationSection("item")).getItem();
-	}
+    public InventoryButtonListener(ConfigurationSection config) {
+        slot = config.getInt("slot");
+        icon = new InventoryButton(config.getConfigurationSection("item")).getItem();
+    }
 
-	@EventHandler
-	public void giveItemsOnJoin(PlayerJoinEvent event) {
-		if (! setupInventoryIcon(event.getPlayer().getInventory())) {
-			event.getPlayer().sendMessage(MMOInventory.plugin.getTranslation("full-inventory"));
-		}
-	}
-	
-	@EventHandler
-	public void giveItemsOnRespawn(PlayerRespawnEvent event) {
-		if (! setupInventoryIcon(event.getPlayer().getInventory())) {
-			event.getPlayer().sendMessage(MMOInventory.plugin.getTranslation("full-inventory"));
-		}
-	}
+    @EventHandler
+    public void giveItemsOnJoin(PlayerJoinEvent event) {
+        if (! setupInventoryIcon(event.getPlayer().getInventory())) {
+            event.getPlayer().sendMessage(MMOInventory.plugin.getTranslation("full-inventory"));
+        }
+    }
+    
+    @EventHandler
+    public void giveItemsOnRespawn(PlayerRespawnEvent event) {
+        if (! setupInventoryIcon(event.getPlayer().getInventory())) {
+            event.getPlayer().sendMessage(MMOInventory.plugin.getTranslation("full-inventory"));
+        }
+    }
 
-	protected boolean setupInventoryIcon(Inventory inv) {
+    protected boolean setupInventoryIcon(Inventory inv) {
 
-		// If slot already is icon
-		// then leave it
-		if (isInventoryButton(inv.getItem(slot))) {
-			return true;
-		}
+        // If slot already is icon
+        // then leave it
+        if (isInventoryButton(inv.getItem(slot))) {
+            return true;
+        }
 
-		ItemStack holder = null;
+        ItemStack holder = null;
 
-		// Delete old button
-		for (int i = 0; i < inv.getSize(); i++) {
-			ItemStack item = inv.getItem(i);
+        // Delete old button
+        for (int i = 0; i < inv.getSize(); i++) {
+            ItemStack item = inv.getItem(i);
 
-			if (i == slot || isEmpty(item)) continue;
+            if (i == slot || isEmpty(item)) continue;
 
-			if (isInventoryButton(inv.getItem(i))) {
-				inv.clear(i);
-			}
-		}
+            if (isInventoryButton(inv.getItem(i))) {
+                inv.clear(i);
+            }
+        }
 
-		// Inventory is full, cant setup
-		if (inv.firstEmpty() == -1) return false;
+        // Inventory is full, cant setup
+        if (inv.firstEmpty() == -1) return false;
 
-		if (isEmpty(inv.getItem(slot)) == false && isInventoryButton(inv.getItem(slot)) == false) {
-			holder = inv.getItem(slot);
-			inv.addItem(holder);
-		}
+        if (isEmpty(inv.getItem(slot)) == false && isInventoryButton(inv.getItem(slot)) == false) {
+            holder = inv.getItem(slot);
+            inv.addItem(holder);
+        }
 
-		inv.setItem(slot, icon);
+        inv.setItem(slot, icon);
 
-		return true;
-	}
+        return true;
+    }
 
-	protected boolean isInventoryButton(ItemStack item) {
-		if (isEmpty(item)) return false;
+    protected boolean isInventoryButton(ItemStack item) {
+        if (isEmpty(item)) return false;
 
-		return MMOInventory.plugin.getVersionWrapper().getNBTItem(item).getBoolean("MMOInventoryButton");
-	}
+        return Utils.isButton(item);
+    }
 
-	protected boolean isEmpty(ItemStack item) {
-		return item == null || Material.AIR.equals(item.getType());
-	}
+    protected boolean isEmpty(ItemStack item) {
+        return item == null || Material.AIR.equals(item.getType());
+    }
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-	public void blockInteractions(InventoryClickEvent event) {
-		if (MMOInventory.plugin.getVersionWrapper().getNBTItem(event.getCurrentItem()).hasTag("MMOInventoryButton")) {
-			new PlayerInventoryView((Player) event.getWhoClicked()).open();
-			event.setCancelled(true);
-		}
-	}
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void blockInteractions(InventoryClickEvent event) {
+        if (Utils.isButton(event.getCurrentItem())) {
+            new PlayerInventoryView((Player) event.getWhoClicked()).open();
+            event.setCancelled(true);
+        }
+    }
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-	public void blockDrop(PlayerDeathEvent event) {
-		Iterator<ItemStack> iterator = event.getDrops().iterator();
-		while (iterator.hasNext()) {
-			ItemStack next = iterator.next();
-			if (MMOInventory.plugin.getVersionWrapper().getNBTItem(next).hasTag("MMOInventoryButton"))
-				iterator.remove();
-		}
-	}
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void blockDrop(PlayerDeathEvent event) {
+        Iterator<ItemStack> iterator = event.getDrops().iterator();
+        while (iterator.hasNext()) {
+            ItemStack next = iterator.next();
+            if (Utils.isButton(next))
+                iterator.remove();
+        }
+    }
 }

@@ -1,50 +1,59 @@
 package net.Indyuce.inventory.inventory;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class InventoryHandler {
-	private final UUID uuid;
+    private final UUID uuid;
 
-	/**
-	 * Player instance is not final because it needs to be updated every time
-	 * the player joins; this instance is used to equip vanilla items
-	 */
-	protected Player player;
+    /**
+     * Player instance is not final because it needs to be updated every time
+     * the player joins; this instance is used to equip vanilla items
+     */
+    @Nullable
+    protected Player player;
 
-	public InventoryHandler(Player player) {
-		this.player = player;
-		this.uuid = player.getUniqueId();
-	}
+    private long lastLogActivity;
 
-	public UUID getUniqueId() {
-		return uuid;
-	}
+    public InventoryHandler(Player player) {
+        this.uuid = player.getUniqueId();
+        updatePlayer(player);
+    }
 
-	public Player getPlayer() {
-		return player;
-	}
+    public UUID getUniqueId() {
+        return uuid;
+    }
 
-	public void updatePlayer(Player player) {
-		this.player = player;
-	}
+    @NotNull
+    public Player getPlayer() {
+        return Objects.requireNonNull(player, "Player is offline");
+    }
 
-	/**
-	 * @return A collection of all the extra items (vanilla slots put aside) ie
-	 *         accessories placed in custom RPG slots
-	 */
-	public abstract Collection<ItemStack> getExtraItems();
+    public void updatePlayer(@Nullable Player player) {
+        this.player = player;
+        this.lastLogActivity = System.currentTimeMillis();
+    }
 
-	/**
-	 * @return A collection of all the extra items (vanilla slots put aside) ie
-	 *         accessories placed in custom RPG slots.
-	 *         <p></p>
-	 *         Skips verification to avoid an infinite loop when checking for
-	 *         the 'unique' requirement where these items check if themselves
-	 *         have passed the condition while checking if they pass it.
-	 */
-	public abstract Collection<ItemStack> getExtraItemsUnverified(Integer... excluded);
+    /**
+     * @param lookupMode The way MMOInv collects and filters
+     *                   items in the returned collection
+     * @return The extra items from the player's custom inventory
+     */
+    public Collection<InventoryItem> getItems(InventoryLookupMode lookupMode) {
+        Set<InventoryItem> items = new HashSet<>();
+        for (InventoryItem invItem : retrieveItems())
+            if (lookupMode == InventoryLookupMode.IGNORE_RESTRICTIONS || invItem.getSlot().checkSlotRestrictions(this, invItem.getItemStack()))
+                items.add(invItem);
+        return items;
+    }
+
+    /**
+     * @return A collection of all the extra items (vanilla slots put aside) ie
+     *         accessories placed in custom RPG slots. This should include all items even
+     *         the ones not usable by the player.
+     */
+    protected abstract Collection<InventoryItem> retrieveItems();
 }

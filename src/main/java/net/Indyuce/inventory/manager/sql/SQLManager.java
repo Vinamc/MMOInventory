@@ -5,11 +5,11 @@ import io.lumine.mythic.lib.MythicLib;
 import io.lumine.mythic.lib.api.util.SimpleWrapper;
 import io.lumine.mythic.lib.sql.MMODataSource;
 import net.Indyuce.inventory.MMOInventory;
+import net.Indyuce.inventory.inventory.InventoryItem;
 import org.bukkit.inventory.ItemStack;
 
 import java.sql.SQLException;
-import java.util.Map.Entry;
-import java.util.Set;
+import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 
 public class SQLManager extends MMODataSource {
@@ -63,13 +63,13 @@ public class SQLManager extends MMODataSource {
 		return data;
 	}
 
-	public void save(final String uuid, final Set<Entry<Integer, ItemStack>> inventory) {
+	public void save(final String uuid, final Collection<InventoryItem> inventory) {
 		final int id = getID(uuid);
 		executeUpdate("DELETE FROM mmoinv_data WHERE id = '" + id + "'");
 		StringBuilder builder = new StringBuilder();
-		for (Entry<Integer, ItemStack> entry : inventory) {
-			String stack = gson.toJson(entry.getValue());
-			builder.append("(" + id + ", " + entry.getKey() + ", '" + stack + "')").append(", ");
+		for (InventoryItem entry : inventory) {
+			String stack = gson.toJson(entry.getItemStack());
+			builder.append("(" + id + ", " + entry.getSlot().getIndex() + ", '" + stack + "')").append(", ");
 		}
 		if (builder.length() > 2) {
 			builder.setLength(builder.length() - 2); // gets rid of the last '", "'

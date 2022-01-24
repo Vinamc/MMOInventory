@@ -3,7 +3,7 @@ package net.Indyuce.inventory.listener;
 import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.api.event.ItemEquipEvent;
 import net.Indyuce.inventory.slot.CustomSlot;
-import net.Indyuce.inventory.version.NBTItem;
+import net.Indyuce.inventory.util.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -28,8 +28,8 @@ public class NoCustomInventory implements Listener {
 
 		Player player = event.getPlayer();
 		for (CustomSlot slot : MMOInventory.plugin.getSlotManager().getCustomSlots()) {
-			NBTItem currentNbt = NBTItem.get(player.getInventory().getItem(slot.getIndex()));
-			if (!isAir(currentNbt.getItem()) && slot.checkSlotRestrictions(MMOInventory.plugin.getDataManager().getInventory(player), currentNbt))
+			ItemStack current = player.getInventory().getItem(slot.getIndex());
+			if (!Utils.isAir(current) && slot.checkSlotRestrictions(MMOInventory.plugin.getDataManager().getInventory(player), current))
 				continue;
 
 			player.getInventory().setItem(slot.getIndex(), slot.getItem());
@@ -42,8 +42,8 @@ public class NoCustomInventory implements Listener {
 			 *
 			 * This issue does not happen on future logins yet can be game breaking.
 			 */
-			if (!isAir(currentNbt.getItem()) && !currentNbt.hasTag("MMOInventoryGuiItem"))
-				for (ItemStack drop : player.getInventory().addItem(currentNbt.getItem()).values())
+			if (!Utils.isAir(current) && !Utils.isGuiItem(current))
+				for (ItemStack drop : player.getInventory().addItem(current).values())
 					player.getWorld().dropItem(player.getLocation(), drop);
 		}
 	}
@@ -77,15 +77,15 @@ public class NoCustomInventory implements Listener {
 		}
 
 		// Player tries to pickup a slot item, without equipping any
-		NBTItem item = NBTItem.get(event.getCurrentItem());
-		if (isAir(event.getCursor()) && item.hasTag("MMOInventoryGuiItem")) {
+		ItemStack item = event.getCurrentItem();
+		if (Utils.isAir(event.getCursor()) && Utils.isGuiItem(item)) {
 			event.setCancelled(true);
 			return;
 		}
 
 		// Check for BOTH custom/vanilla slot restrictions
-		NBTItem cursor = NBTItem.get(event.getCursor());
-		if (!isAir(event.getCursor())) {
+		ItemStack cursor = event.getCursor();
+		if (!Utils.isAir(event.getCursor())) {
 
 			// Prevents equipping stacked items
 			if (MMOInventory.plugin.getConfig().getBoolean("disable-equiping-stacked-items", true) && event.getCursor().getAmount() > 1) {
@@ -101,7 +101,7 @@ public class NoCustomInventory implements Listener {
 		}
 
 		// Call Bukkit event
-		ItemEquipEvent.EquipAction action = isAir(event.getCursor()) ? ItemEquipEvent.EquipAction.UNEQUIP : cursor.hasTag("MMOInventoryGuiItem") ? ItemEquipEvent.EquipAction.EQUIP : ItemEquipEvent.EquipAction.SWAP_ITEMS;
+		ItemEquipEvent.EquipAction action = Utils.isAir(event.getCursor()) ? ItemEquipEvent.EquipAction.UNEQUIP : Utils.isGuiItem(cursor) ? ItemEquipEvent.EquipAction.EQUIP : ItemEquipEvent.EquipAction.SWAP_ITEMS;
 		ItemEquipEvent called = new ItemEquipEvent(player, event.getCursor(), slot, action);
 		Bukkit.getPluginManager().callEvent(called);
 		if (called.isCancelled()) {
@@ -114,14 +114,14 @@ public class NoCustomInventory implements Listener {
 		 * instantly after checking the equip event was not canceled (bug
 		 * fix)
 		 */
-		if (MMOInventory.plugin.getVersionWrapper().getNBTItem(event.getCurrentItem()).hasTag("MMOInventoryGuiItem"))
+		if (Utils.isGuiItem(item))
 			event.setCurrentItem(null);
 
 		/*
 		 * If the player is taking away an item without swapping it, place
 		 * the inventory slot item back in the corresponding slot
 		 */
-		if (isAir(event.getCursor()))
+		if (Utils.isAir(event.getCursor()))
 			Bukkit.getScheduler().runTask(MMOInventory.plugin, () -> player.getInventory().setItem(slot.getIndex(), slot.getItem()));
 
 		// Finally update the player's inventory
@@ -136,7 +136,7 @@ public class NoCustomInventory implements Listener {
 		Iterator<ItemStack> iterator = event.getDrops().iterator();
 		while (iterator.hasNext()) {
 			ItemStack next = iterator.next();
-			if (NBTItem.get(next).hasTag("MMOInventoryGuiItem"))
+			if (Utils.isGuiItem(next))
 				iterator.remove();
 		}
 	}
@@ -144,10 +144,5 @@ public class NoCustomInventory implements Listener {
 	@EventHandler
 	public void giveItemsOnRespawn(PlayerRespawnEvent event) {
 		giveItemsOnJoin(new PlayerJoinEvent(event.getPlayer(), "You found a secret dev easter egg"));
-	}
-
-	// checks for both null and AIR material
-	private boolean isAir(ItemStack item) {
-		return item == null || item.getType() == Material.AIR;
 	}
 }

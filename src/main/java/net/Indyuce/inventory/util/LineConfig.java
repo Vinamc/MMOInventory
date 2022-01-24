@@ -15,8 +15,8 @@ public class LineConfig {
 		this.value = value;
 
 		/*
-		 * if there is no config, no need to parse the json object. split,
-		 * define key and find arg
+		 * If there is no config, no need to parse the json object.
+		 * Split, define key and find arguments
 		 */
 		if (!value.contains("{") || !value.contains("}")) {
 			String[] split = value.split("\\ ");
@@ -26,9 +26,7 @@ public class LineConfig {
 			return;
 		}
 
-		/*
-		 * load json and extra args
-		 */
+		// Load json and extra args
 		int begin = value.indexOf("{"), end = value.lastIndexOf("}") + 1;
 		key = value.substring(0, begin);
 
@@ -42,8 +40,8 @@ public class LineConfig {
 		args = format.isEmpty() ? new String[0] : format.split("\\ ");
 	}
 
-	/*
-	 * extra arguments outside the config brackets
+	/**
+	 * @return Extra arguments outside the config brackets
 	 */
 	public String[] args() {
 		return args;

@@ -1,13 +1,15 @@
 package net.Indyuce.inventory.compat.mmoitems;
 
-import net.Indyuce.inventory.util.LineConfig;
-import net.Indyuce.inventory.version.NBTItem;
+import io.lumine.mythic.lib.api.item.NBTItem;
 import net.Indyuce.inventory.inventory.InventoryHandler;
+import net.Indyuce.inventory.inventory.InventoryItem;
+import net.Indyuce.inventory.inventory.InventoryLookupMode;
 import net.Indyuce.inventory.slot.CustomSlot;
-import net.Indyuce.inventory.slot.SlotRestriction;
+import net.Indyuce.inventory.slot.restriction.SlotRestriction;
+import net.Indyuce.inventory.util.LineConfig;
 import org.bukkit.inventory.ItemStack;
 
-public class MMOItemsUniqueRestriction extends SlotRestriction {
+public class UniqueRestriction extends SlotRestriction {
     private final boolean enabled;
 
     /**
@@ -15,7 +17,7 @@ public class MMOItemsUniqueRestriction extends SlotRestriction {
      *
      * @param config
      */
-    public MMOItemsUniqueRestriction(LineConfig config) {
+    public UniqueRestriction(LineConfig config) {
         config.validate("enabled");
         enabled = config.getBoolean("enabled");
     }
@@ -25,22 +27,31 @@ public class MMOItemsUniqueRestriction extends SlotRestriction {
      * have passed this condition when checking if they pass it.
      */
     boolean verifying = false;
-    public boolean isVerifying() { return verifying; }
+
+    public boolean isVerifying() {
+        return verifying;
+    }
 
     @Override
-    public boolean isVerified(InventoryHandler provider, CustomSlot slot, NBTItem item) {
-        if (!isEnabled()) { return true; }
-        if (isVerifying()) { return false; }
+    public boolean isVerified(InventoryHandler provider, CustomSlot slot, ItemStack item) {
+        if (!isEnabled())
+            return true;
+        if (isVerifying())
+            return false;
         verifying = true;
 
-        String set = item.getString("MMOITEMS_ACCESSORY_SET");
+        NBTItem nbtItem = NBTItem.get(item);
+        String set = nbtItem.getString("MMOITEMS_ACCESSORY_SET");
 
         // Get Equipped Items
-        for (ItemStack invItem : provider.getExtraItemsUnverified(slot.getIndex())) {
+        for (InventoryItem invItem : provider.getItems(InventoryLookupMode.IGNORE_RESTRICTIONS)) {
+
+            // Forget if same slot
+            if (slot.getIndex() == invItem.getSlot().getIndex())
+                continue;
 
             // Same MMOItem?
-            NBTItem nbtItem = NBTItem.get(invItem);
-            boolean sameItem = getStringMMOItem(nbtItem).equalsIgnoreCase(getStringMMOItem(item));
+            boolean sameItem = getStringMMOItem(nbtItem).equalsIgnoreCase(getStringMMOItem(nbtItem));
             boolean sameSet = (set != null) && (set.length() > 0) && set.equalsIgnoreCase(nbtItem.getString("MMOITEMS_ACCESSORY_SET"));
 
             // Cancel if the mmoitem is the same or the set is the same.

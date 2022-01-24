@@ -3,7 +3,9 @@ package net.Indyuce.inventory.manager;
 import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.inventory.CustomInventoryHandler;
 import net.Indyuce.inventory.inventory.InventoryHandler;
+import net.Indyuce.inventory.slot.CustomSlot;
 import net.Indyuce.inventory.util.ConfigFile;
+import net.Indyuce.inventory.util.Utils;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -29,7 +31,7 @@ public class YamlDataManager extends DataManager {
         try {
             for (int index : data.getFilledSlotKeys()) {
                 ItemStack item = data.getItem(index);
-                config.getConfig().set("inventory." + index, isAir(item) ? null : item);
+                config.getConfig().set("inventory." + index, Utils.isAir(item) ? null : item);
             }
             config.save();
         } catch (Exception exception) {
@@ -44,14 +46,10 @@ public class YamlDataManager extends DataManager {
         if (config.contains("inventory"))
             for (String key : config.getConfigurationSection("inventory").getKeys(false))
                 try {
-                    int index = Integer.parseInt(key);
-                    data.getMapped().put(index, config.getItemStack("inventory." + index));
+                    CustomSlot customSlot = MMOInventory.plugin.getSlotManager().get(Integer.parseInt(key));
+                    data.setItem(customSlot, config.getItemStack("inventory." + key));
                 } catch (IllegalArgumentException exception) {
                     MMOInventory.plugin.getLogger().log(Level.SEVERE, "Could not read inventory item indexed " + key + " of " + data.getPlayer().getName() + ": " + exception.getMessage());
                 }
-    }
-
-    private boolean isAir(ItemStack item) {
-        return item == null || item.getType() == Material.AIR;
     }
 }

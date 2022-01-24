@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 public class ItemEquipEvent extends PlayerEvent implements Cancellable {
 	private static final HandlerList handlers = new HandlerList();
 
+	@Nullable
 	private final ItemStack item;
 	private final CustomSlot slot;
 	private final EquipAction action;
@@ -19,8 +20,8 @@ public class ItemEquipEvent extends PlayerEvent implements Cancellable {
 	private boolean cancelled = false;
 
 	/**
-	 * Event called whenever a player equips an item in a custom or vanilla slot
-	 * when he has the custom inventory opened
+	 * Event called whenever a player equips an item in a custom or
+	 * vanilla slot when he has the custom inventory opened
 	 *
 	 * @param player Playing equipping the item
 	 * @param item   Item being equipped in a custom slot, or null if the player is

@@ -3,13 +3,14 @@ package net.Indyuce.inventory.util;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.Indyuce.inventory.MMOInventory;
-import net.Indyuce.inventory.version.ItemTag;
 import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.lang.reflect.Field;
 import java.util.UUID;
@@ -22,7 +23,7 @@ public class InventoryButton {
 	 * Used to read an item icon from the config file. It can be a textured
 	 * player head using the 'texture' config key, a modeled item using 'model'.
 	 * Using 'material' you can choose the item material.
-	 * 
+	 *
 	 * @param config
 	 *            Config to read from
 	 */
@@ -55,15 +56,14 @@ public class InventoryButton {
 				throw new IllegalArgumentException(exception.getMessage());
 			}
 
-		item.setItemMeta(meta);
-
 		// Apply custom model data
 		if (config.contains("model"))
-			item.setItemMeta(MMOInventory.plugin.getVersionWrapper().getModelItem(item.getType(), config.getInt("model")).getItemMeta());
+			meta.setCustomModelData(config.getInt("model"));
 
 		// Apply correct NBTtag
-		item.setItemMeta(MMOInventory.plugin.getVersionWrapper().getNBTItem(item).addTag(new ItemTag("MMOInventoryButton", true))
-				.toItem().getItemMeta());
+		meta.getPersistentDataContainer().set(new NamespacedKey(MMOInventory.plugin, "Button"), PersistentDataType.BYTE, (byte) 1);
+
+		item.setItemMeta(meta);
 	}
 
 	public ItemStack getItem() {

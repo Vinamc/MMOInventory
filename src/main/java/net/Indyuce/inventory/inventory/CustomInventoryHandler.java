@@ -3,9 +3,10 @@ package net.Indyuce.inventory.inventory;
 import net.Indyuce.inventory.MMOInventory;
 import net.Indyuce.inventory.slot.CustomSlot;
 import net.Indyuce.inventory.slot.SlotType;
-import org.bukkit.Material;
+import net.Indyuce.inventory.util.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,7 +21,7 @@ public class CustomInventoryHandler extends InventoryHandler {
 	 * much easier to access every item at the same time. It also makes items
 	 * accessible and EDITABLE by any other plugins.
 	 */
-	private final Map<Integer, ItemStack> items = new HashMap<>();
+	private final Map<Integer, InventoryItem> items = new HashMap<>();
 
 	/**
 	 * Used when MMOInventory utilizes the custom inventory GUI
@@ -38,7 +39,7 @@ public class CustomInventoryHandler extends InventoryHandler {
 			 * Map containing no NULL values makes it much easier for external
 			 * plugins to manipulate the mapped itemStacks
 			 */
-			if (isAir(item))
+			if (Utils.isAir(item))
 				items.remove(slot.getIndex());
 
 				/*
@@ -47,15 +48,16 @@ public class CustomInventoryHandler extends InventoryHandler {
 				 * custom inventory
 				 */
 			else
-				items.put(slot.getIndex(), item.clone());
+				items.put(slot.getIndex(), new InventoryItem(item.clone(), slot));
 
 			// Equip vanilla items
 		} else
 			slot.getType().getVanillaSlotHandler().equip(player, item);
 	}
 
-	public Map<Integer, ItemStack> getMapped() {
-		return items;
+	@Override
+	protected Collection<InventoryItem> retrieveItems() {
+		return items.values();
 	}
 
 	/**
@@ -66,12 +68,15 @@ public class CustomInventoryHandler extends InventoryHandler {
 	 * @param slot Custom slot to check
 	 * @return The item equipped by the player
 	 */
+	@Nullable
 	public ItemStack getItem(CustomSlot slot) {
 		return slot.getType().isCustom() ? getItem(slot.getIndex()) : slot.getType().getVanillaSlotHandler().retrieveItem(player);
 	}
 
+	@Nullable
 	public ItemStack getItem(int slot) {
-		return items.get(slot);
+		InventoryItem invItem = items.get(slot);
+		return invItem == null ? null : invItem.getItemStack();
 	}
 
 	/**
@@ -83,31 +88,7 @@ public class CustomInventoryHandler extends InventoryHandler {
 	 * @return If the player has an item in a specific slot
 	 */
 	public boolean hasItem(CustomSlot slot) {
-		return slot.getType().isCustom() ? items.containsKey(slot.getIndex()) : !isAir(slot.getType().getVanillaSlotHandler().retrieveItem(player));
-	}
-
-	@Override
-	public Collection<ItemStack> getExtraItems() {
-		return items.values();
-	}
-
-	@Override
-	public Collection<ItemStack> getExtraItemsUnverified(Integer... excluded) {
-
-		// Don't return the excluded values tho
-		Collection<ItemStack> ret = items.values();
-
-		// Remove excluded
-		for (Integer ex : excluded) {
-
-			// Get
-			ItemStack value = items.get(ex);
-
-			// Remove
-			ret.remove(value);
-		}
-
-		return items.values();
+		return slot.getType().isCustom() ? items.containsKey(slot.getIndex()) : !Utils.isAir(slot.getType().getVanillaSlotHandler().retrieveItem(player));
 	}
 
 	public Set<Integer> getFilledSlotKeys() {
@@ -116,9 +97,5 @@ public class CustomInventoryHandler extends InventoryHandler {
 
 	public Set<CustomSlot> getFilledSlots() {
 		return items.keySet().stream().map(id -> MMOInventory.plugin.getSlotManager().get(id)).collect(Collectors.toSet());
-	}
-
-	private boolean isAir(ItemStack item) {
-		return item == null || item.getType() == Material.AIR;
 	}
 }

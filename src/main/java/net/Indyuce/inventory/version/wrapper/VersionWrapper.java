@@ -1,14 +1,12 @@
 package net.Indyuce.inventory.version.wrapper;
 
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
-import net.Indyuce.inventory.version.NBTItem;
-
+/**
+ * NMS free use of version wrapper. Since no NMS is used
+ * to handle NBT tags from items, the plugin is not compatible
+ * with spigot builds from 1.12 to 1.13
+ */
 public interface VersionWrapper {
-	public NBTItem getNBTItem(ItemStack item);
-
-	public ItemStack getModelItem(Material material, int model);
-
-	public boolean isHelmet(Material material);
+    boolean isHelmet(Material material);
 }

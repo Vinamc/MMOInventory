@@ -2,11 +2,15 @@ package net.Indyuce.inventory;
 
 import net.Indyuce.inventory.command.MMOInventoryCommand;
 import net.Indyuce.inventory.command.MMOInventoryCompletion;
+import net.Indyuce.inventory.compat.ClassModule;
 import net.Indyuce.inventory.compat.InventoryUpdater;
+import net.Indyuce.inventory.compat.LevelModule;
+import net.Indyuce.inventory.compat.ModuleType;
+import net.Indyuce.inventory.compat.list.DefaultHook;
 import net.Indyuce.inventory.compat.mmoitems.MMOItemsCompatibility;
-import net.Indyuce.inventory.compat.mmoitems.MMOItemsLevelRestriction;
-import net.Indyuce.inventory.compat.mmoitems.MMOItemsTypeRestriction;
-import net.Indyuce.inventory.compat.mmoitems.MMOItemsUniqueRestriction;
+import net.Indyuce.inventory.compat.mmoitems.TypeRestriction;
+import net.Indyuce.inventory.compat.mmoitems.UniqueRestriction;
+import net.Indyuce.inventory.compat.mmoitems.UseRestriction;
 import net.Indyuce.inventory.inventory.SimpleInventoryHandler;
 import net.Indyuce.inventory.listener.*;
 import net.Indyuce.inventory.manager.DataManager;
@@ -14,15 +18,16 @@ import net.Indyuce.inventory.manager.SlotManager;
 import net.Indyuce.inventory.manager.YamlDataManager;
 import net.Indyuce.inventory.manager.sql.SQLDataManager;
 import net.Indyuce.inventory.util.ConfigFile;
+import net.Indyuce.inventory.util.Utils;
 import net.Indyuce.inventory.version.ServerVersion;
 import net.Indyuce.inventory.version.wrapper.VersionWrapper;
-import net.Indyuce.inventory.version.wrapper.VersionWrapper_Reflection;
+import net.Indyuce.inventory.version.wrapper.VersionWrapper_Recent;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.java.JavaPlugin;
+import ru.endlesscode.rpginventory.RPGInventory;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-public class MMOInventory extends JavaPlugin implements Listener {
+public class MMOInventory extends RPGInventory implements Listener {
     public static MMOInventory plugin;
 
     private final SlotManager slotManager = new SlotManager();
@@ -42,6 +47,8 @@ public class MMOInventory extends JavaPlugin implements Listener {
      */
     private final List<InventoryUpdater> inventoryUpdaters = new ArrayList<>();
 
+    private LevelModule levelModule;
+    private ClassModule classModule;
     private DataManager dataManager;
     private ServerVersion version;
     private VersionWrapper versionWrapper;
@@ -54,9 +61,9 @@ public class MMOInventory extends JavaPlugin implements Listener {
         plugin = this;
 
         if (Bukkit.getPluginManager().getPlugin("MMOItems") != null) {
-            slotManager.registerRestriction(MMOItemsTypeRestriction::new, "mmoitemstype", "mmoitemtype", "mitype");
-            slotManager.registerRestriction(config -> new MMOItemsLevelRestriction(), "mmoitemslevel", "mmoitemlevel", "milevel");
-            slotManager.registerRestriction(MMOItemsUniqueRestriction::new, "unique");
+            slotManager.registerRestriction(TypeRestriction::new, "mmoitemstype", "mmoitemtype", "mitype");
+            slotManager.registerRestriction(config -> new UseRestriction(), "mmoitemslevel", "mmoitemlevel", "milevel");
+            slotManager.registerRestriction(UniqueRestriction::new, "unique");
         }
     }
 
@@ -65,11 +72,9 @@ public class MMOInventory extends JavaPlugin implements Listener {
         try {
             version = new ServerVersion(Bukkit.getServer().getClass());
             getLogger().log(Level.INFO, "Detected Bukkit Version: " + version.toString());
-            versionWrapper = (VersionWrapper) Class.forName("net.Indyuce.inventory.version.wrapper.VersionWrapper_" + version.toString().substring(1))
-                    .newInstance();
+            versionWrapper = (VersionWrapper) Class.forName("net.Indyuce.inventory.version.wrapper.VersionWrapper_" + version.toString().substring(1)).getDeclaredConstructor().newInstance();
         } catch (Exception e) {
-            getLogger().log(Level.INFO, "Your server version is handled via reflection");
-            versionWrapper = new VersionWrapper_Reflection();
+            versionWrapper = new VersionWrapper_Recent();
         }
 
         saveDefaultConfig();
@@ -83,6 +88,32 @@ public class MMOInventory extends JavaPlugin implements Listener {
 
         // MySQL or YAML
         dataManager = getConfig().getBoolean("mysql.enabled") ? new SQLDataManager() : new YamlDataManager();
+
+        // Load class module
+        try {
+            String moduleName = getConfig().getString("class-module");
+            ModuleType moduleType = ModuleType.valueOf(Utils.enumName(moduleName));
+            Validate.isTrue(moduleType.findPlugin(), "Plugin '" + moduleType.name() + "'not installed");
+            Object module = moduleType.getModule();
+            Validate.isTrue(module instanceof ClassModule, "Plugin '" + moduleType.name() + "' does not support classes");
+            this.classModule = (ClassModule) module;
+        } catch (Exception exception) {
+            getLogger().log(Level.WARNING, "Could not initialize custom class module: " + exception.getMessage());
+            this.classModule = new DefaultHook();
+        }
+
+        // Load level module
+        try {
+            String moduleName = getConfig().getString("level-module");
+            ModuleType moduleType = ModuleType.valueOf(Utils.enumName(moduleName));
+            Validate.isTrue(moduleType.findPlugin(), "Plugin '" + moduleType.name() + "'not installed");
+            Object module = moduleType.getModule();
+            Validate.isTrue(module instanceof LevelModule, "Plugin '" + moduleType.name() + "' does not support levels");
+            this.levelModule = (LevelModule) module;
+        } catch (Exception exception) {
+            getLogger().log(Level.WARNING, "Could not initialize custom level module: " + exception.getMessage());
+            this.levelModule = new DefaultHook();
+        }
 
         if (getConfig().getBoolean("resource-pack.enabled"))
             Bukkit.getServer().getPluginManager().registerEvents(new ResourcePack(getConfig().getConfigurationSection("resource-pack")), this);
@@ -148,6 +179,14 @@ public class MMOInventory extends JavaPlugin implements Listener {
 
     public ServerVersion getVersion() {
         return version;
+    }
+
+    public LevelModule getLevelModule() {
+        return levelModule;
+    }
+
+    public ClassModule getClassModule() {
+        return classModule;
     }
 
     public void registerInventoryUpdater(InventoryUpdater updater) {
